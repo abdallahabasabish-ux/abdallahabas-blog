@@ -1,0 +1,82 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatDateAr, readingTimeAr } from "@/lib/utils";
+import Icon from "./Icon.astro";
+
+type Props = {
+  post: CollectionEntry<"posts">;
+  variant?: "default" | "wide" | "compact";
+};
+
+const { post, variant = "default" } = Astro.props;
+const { data } = post;
+const url = `/blog/${post.id}`;
+---
+{/* variant: wide */}
+{variant === "wide" ? (
+  <article class="group grid overflow-hidden rounded-2xl bg-white ring-1 ring-ink-100 transition-shadow hover:shadow-[var(--shadow-soft)] md:grid-cols-2">
+    <a href={url} class="relative block aspect-[16/10] overflow-hidden bg-ink-100 md:aspect-auto md:h-full">
+      <img
+        src={data.cover}
+        alt={data.coverAlt}
+        loading="lazy"
+        decoding="async"
+        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+      />
+    </a>
+    <div class="flex flex-col justify-center p-6 md:p-8">
+      <div class="flex flex-wrap items-center gap-2 text-xs text-ink-500">
+        <span class="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 font-semibold text-brand-700">
+          {data.category.data.name}
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <Icon name="calendar" size={13} /> {formatDateAr(data.publishedAt)}
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <Icon name="clock" size={13} /> {readingTimeAr(data.title + data.excerpt)} د
+        </span>
+      </div>
+      <h3 class="mt-3 text-xl font-bold leading-snug text-ink-900 md:text-2xl">
+        <a href={url} class="hover:text-brand-600 transition-colors">{data.title}</a>
+      </h3>
+      <p class="clamp-3 mt-3 text-sm leading-relaxed text-ink-500 md:text-base">{data.excerpt}</p>
+      <span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
+        اقرأ المقال <Icon name="arrowLeft" size={16} />
+      </span>
+    </div>
+  </article>
+) : (
+  <article class="group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-ink-100 transition-shadow hover:shadow-[var(--shadow-soft)]">
+    <a href={url} class="relative block aspect-[16/10] overflow-hidden bg-ink-100">
+      <img
+        src={data.cover}
+        alt={data.coverAlt}
+        loading="lazy"
+        decoding="async"
+        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+      />
+      {data.featured && (
+        <span class="absolute top-3 right-3 rounded-full bg-brand-500 px-2.5 py-1 text-[11px] font-bold text-white shadow">
+          مميز
+        </span>
+      )}
+    </a>
+    <div class="flex flex-1 flex-col p-5">
+      <div class="flex items-center gap-2 text-xs text-ink-500">
+        <span class="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-1 font-semibold text-brand-700">
+          {data.category.data.name}
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <Icon name="clock" size={13} /> {readingTimeAr(data.title + data.excerpt)} د
+        </span>
+      </div>
+      <h3 class="mt-3 text-base font-bold leading-snug text-ink-900 md:text-lg">
+        <a href={url} class="hover:text-brand-600 transition-colors">{data.title}</a>
+      </h3>
+      <p class="clamp-2 mt-2 text-sm leading-relaxed text-ink-500">{data.excerpt}</p>
+      <div class="mt-auto pt-4 text-xs text-ink-500">
+        {formatDateAr(data.publishedAt)}
+      </div>
+    </div>
+  </article>
+)}
