@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الأسئلة الشائعة — مدونة Abdallah Abas</title>
+<meta name="description" content="إجابات على الأسئلة الأكثر شيوعًا حول المدونة، المحتوى، والخدمات.">
+<link rel="canonical" href="https://blog.abdallahabas.com/faq.html">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="faq">
+
+<div id="app-header"></div>
+
+<main id="main">
+  <section class="page-head">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">الرئيسية</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        <span>الأسئلة الشائعة</span>
+      </nav>
+      <h1>الأسئلة الشائعة</h1>
+      <p>إجابات مختصرة لأكثر ما يُسأل عن المدونة والخدمات.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="max-width:820px">
+      <div class="faq-list" id="faqList"></div>
+
+      <div class="cta-band" style="margin-top:44px">
+        <div class="cta-band-body">
+          <h2>لم تجد ما تبحث عنه؟</h2>
+          <p>أرسل لي سؤالك مباشرة وسأجيبك في أقرب وقت.</p>
+        </div>
+        <a href="contact.html" class="btn btn-dark">تواصل معي</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="app-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const db = AAB.DB.get();
+
+  const FAQS = [
+    { q: 'ما هو هدف هذه المدونة؟', a: 'مشاركة محتوى عملي في تطوير الويب، تحسين محركات البحث، وتصميم الواجهات — مبني على تجارب حقيقية لا نظريات.' },
+    { q: 'هل يمكنني استخدام محتوى المدونة في مشاريعي؟', a: 'نعم، يمكنك الاستفادة من المحتوى لأغراض شخصية أو تعليمية مع الإشارة إلى المصدر. لإعادة النشر التجاري، تواصل معي.' },
+    { q: 'كيف أتواصل معك لطلب خدمة؟', a: 'عبر صفحة "تواصل معي" أو مباشرة من الموقع الرئيسي abdallahabas.com.' },
+    { q: 'هل تنشر مقالات بانتظام؟', a: 'أنشر عندما يكون لدي شيء مفيد وقابل للتطبيق — لا ألتزم بعدد ثابت لتجنب الحشو.' },
+    { q: 'هل تقبل مقالات ضيوف؟', a: 'أقبل فقط من كتّاب ذوي خبرة حقيقية في مجالات المدونة. أرسل مقترحك عبر صفحة التواصل.' },
+    { q: 'كيف أشترك في النشرة البريدية؟', a: 'من الصفحة الرئيسية — فعّل الاشتراك لتستقبل المقالات المختارة مرة كل أسبوعين.' },
+    { q: 'هل المدونة مرتبطة بالمتجر الرئيسي؟', a: 'نعم، لكنها مستقلة تقنيًا. تربطها نفس الهوية البصرية والعلامة الشخصية.' },
+    { q: 'كيف أحصل على استشارة في SEO أو تطوير الويب؟', a: 'عبر صفحة التواصل، أو من خلال الخدمات على الموقع الرئيسي.' }
+  ];
+
+  document.getElementById('faqList').innerHTML = FAQS.map((f, i) => `
+    <details class="faq-item" ${i === 0 ? 'open' : ''}>
+      <summary>${AAB.esc(f.q)}</summary>
+      <div class="faq-body">${AAB.esc(f.a)}</div>
+    </details>
+  `).join('');
+
+  AAB.setSEO({
+    title: 'الأسئلة الشائعة — ' + db.settings.siteName,
+    description: 'إجابات على الأسئلة الأكثر شيوعًا حول المدونة والخدمات.',
+    canonical: AAB.SITE + '/faq.html',
+    schema: {
+      "@context":"https://schema.org",
+      "@type":"FAQPage",
+      "mainEntity": FAQS.map(f => ({
+        "@type":"Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type":"Answer", "text": f.a }
+      }))
+    }
+  });
+});
+</script>
+</body>
+</html>
