@@ -39,7 +39,7 @@ window.AAB = window.AAB || {};
       name: 'Abdallah Abas',
       title: 'مطوّر Full-Stack ومهندس SEO',
       bio: 'أساعد الأفراد والشركات على بناء حضور رقمي قوي عبر تطوير الويب، تحسين محركات البحث، وتصميم تجارب استخدام واضحة. أكتب هنا ما أتعلمه من مشاريع حقيقية.',
-      avatar: 'assets/img/author.jpg',
+      avatar: 'assets/img/abdallah.svg',
       skills: ['تطوير الويب', 'تحسين محركات البحث', 'Core Web Vitals', 'تصميم UI/UX', 'أداء المواقع'],
       links: {
         website: 'https://abdallahabas.com',
