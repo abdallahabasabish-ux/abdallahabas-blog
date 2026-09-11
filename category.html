@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تصنيف — مدونة Abdallah Abas</title>
+<link rel="canonical" href="https://blog.abdallahabas.com/">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="categories">
+
+<div id="app-header"></div>
+
+<main id="main">
+  <div id="catRoot"></div>
+</main>
+
+<div id="app-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const slug = new URLSearchParams(location.search).get('slug');
+  const root = document.getElementById('catRoot');
+  const db = AAB.DB.get();
+
+  const cat = slug ? AAB.getCategoryBySlug(slug) : null;
+  if (!cat) {
+    root.innerHTML = `
+      <section class="page-head"><div class="container">
+        <h1>التصنيف غير موجود</h1>
+        <p>الرابط غير صحيح أو تم حذف التصنيف.</p>
+        <div class="mt-32"><a href="categories.html" class="btn btn-brand">كل التصنيفات</a></div>
+      </div></section>`;
+    AAB.setSEO({ title: 'تصنيف غير موجود — ' + db.settings.siteName });
+    return;
+  }
+
+  const PER_PAGE = 6;
+  const params = new URLSearchParams(location.search);
+  let page = Math.max(1, parseInt(params.get('page') || '1', 10));
+
+  const posts = AAB.catPosts(cat.id);
+  const total = posts.length;
+  const pages = Math.max(1, Math.ceil(total / PER_PAGE));
+  if (page > pages) page = pages;
+  const slice = posts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  const cover = cat.image || posts[0]?.cover || '';
+
+  root.innerHTML = `
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+          <a href="categories.html">التصنيفات</a>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+          <span>${AAB.esc(cat.name)}</span>
+        </nav>
+        <h1>${AAB.esc(cat.name)}</h1>
+        <p>${AAB.esc(cat.description || '')}</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="search-summary">
+          <div><strong>${total}</strong> مقال في هذا التصنيف</div>
+        </div>
+        ${slice.length ? `<div class="grid grid-2" style="gap:28px">
+          ${slice.map(p => AAB.postCard(p)).join('')}
+        </div>` : `
+          <div class="empty-state">
+            <div class="emoji">${AAB.icon.folder}</div>
+            <h2>لا توجد مقالات في هذا التصنيف بعد</h2>
+            <p>سيتم إضافة محتوى قريبًا.</p>
+          </div>`}
+        <div id="catPagination" class="pagination"></div>
+      </div>
+    </section>
+  `;
+
+  if (pages > 1) {
+    const el = document.getElementById('catPagination');
+    const qs = (n) => `category.html?slug=${encodeURIComponent(cat.slug)}${n > 1 ? '&page=' + n : ''}`;
+    const items = [];
+    items.push(page > 1 ? `<a href="${qs(page-1)}">السابق</a>` : `<span class="is-disabled">السابق</span>`);
+    for (let i = 1; i <= pages; i++) {
+      if (i === 1 || i === pages || Math.abs(i - page) <= 1) {
+        items.push(i === page ? `<span class="is-current">${i}</span>` : `<a href="${qs(i)}">${i}</a>`);
+      } else if (items[items.length - 1] !== '<span class="is-disabled">…</span>') {
+        items.push('<span class="is-disabled">…</span>');
+      }
+    }
+    items.push(page < pages ? `<a href="${qs(page+1)}">التالي</a>` : `<span class="is-disabled">التالي</span>`);
+    el.innerHTML = items.join('');
+  }
+
+  AAB.setSEO({
+    title: (cat.seoTitle || cat.name) + ' — ' + db.settings.siteName,
+    description: cat.metaDescription || cat.description,
+    canonical: AAB.SITE + '/category.html?slug=' + encodeURIComponent(cat.slug) + (page > 1 ? '&page=' + page : ''),
+    image: cover,
+    type: 'website',
+    schema: {
+      "@context":"https://schema.org",
+      "@type":"CollectionPage",
+      "name": cat.name,
+      "description": cat.description,
+      "url": AAB.SITE + '/category.html?slug=' + encodeURIComponent(cat.slug),
+      "inLanguage":"ar",
+      "isPartOf": { "@type":"Blog", "name": db.settings.siteName, "url": AAB.SITE + '/' }
+    }
+  });
+});
+</script>
+</body>
+</html>
