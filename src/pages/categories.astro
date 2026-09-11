@@ -1,0 +1,55 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import { breadcrumbSchema } from "@/lib/seo";
+
+const categories = (await getCollection("categories"))
+  .sort((a, b) => a.data.order - b.data.order);
+
+const posts = await getCollection("posts", (p) => p.data.status === "published");
+const countByCat = (catId: string) =>
+  posts.filter((p) => p.data.category?.id === catId).length;
+
+const schemas = [
+  breadcrumbSchema([
+    { name: "الرئيسية", url: "/" },
+    { name: "التصنيفات", url: "/categories" },
+  ]),
+];
+---
+<BaseLayout title="التصنيفات" description="تصفح مقالات المدونة حسب التصنيف." path="/categories" schemas={schemas}>
+  <section class="container-blog pt-12 md:pt-16">
+    <header class="max-w-2xl">
+      <p class="text-sm font-semibold text-brand-600">المدونة</p>
+      <h1 class="mt-2 text-3xl font-bold text-ink-900 md:text-4xl">التصنيفات</h1>
+      <p class="mt-3 text-ink-500">تصفح المقالات حسب المجال.</p>
+    </header>
+
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {categories.map((c) => (
+        <a href={`/category/${c.data.slug}`}
+          class="group rounded-2xl border border-ink-100 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-soft)]">
+          <div class="flex items-start justify-between">
+            <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600">
+              <Icon name="folder" size={22} />
+            </div>
+            <span class="rounded-full bg-ink-100 px-2.5 py-1 text-xs font-semibold text-ink-700">
+              {countByCat(c.id)} مقال
+            </span>
+          </div>
+          <h2 class="mt-4 text-lg font-bold text-ink-900 group-hover:text-brand-600">{c.data.name}</h2>
+          {c.data.description && (
+            <p class="mt-2 text-sm leading-relaxed text-ink-500">{c.data.description}</p>
+          )}
+        </a>
+      ))}
+    </div>
+
+    {categories.length === 0 && (
+      <p class="mt-10 rounded-2xl border border-dashed border-ink-200 p-12 text-center text-ink-500">
+        لا توجد تصنيفات بعد.
+      </p>
+    )}
+  </section>
+</BaseLayout>
