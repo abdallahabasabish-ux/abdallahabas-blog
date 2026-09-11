@@ -1,0 +1,22 @@
+---
+type Props = { items: { q: string; a: string }[] };
+const { items } = Astro.props;
+---
+{items?.length > 0 && (
+  <section class="mt-12" aria-labelledby="faq-title">
+    <h2 id="faq-title" class="text-2xl font-bold text-ink-900 mb-5">الأسئلة الشائعة</h2>
+    <div class="space-y-3">
+      {items.map((item) => (
+        <details class="group rounded-2xl border border-ink-100 bg-white p-1 open:shadow-[var(--shadow-soft)]">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-base font-semibold text-ink-900 marker:hidden [&::-webkit-details-marker]:hidden">
+            <span>{item.q}</span>
+            <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </summary>
+          <div class="px-4 pb-4 pt-1 text-sm leading-relaxed text-ink-700">{item.a}</div>
+        </details>
+      ))}
+    </div>
+  </section>
+)}
