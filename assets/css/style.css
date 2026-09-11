@@ -1,9 +1,11 @@
 /* =========================================================
-   Abdallah Abas — Blog Stylesheet
+   Abdallah Abas — Blog Stylesheet (Final)
    RTL · Arabic · Brand: Orange #FF5A00 + Black #0A0A0A
    ========================================================= */
 
-/* ---------- 1. Reset ---------- */
+/* =========================================================
+   1. Reset
+   ========================================================= */
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:90px}
 body,h1,h2,h3,h4,h5,p,ul,ol,figure,blockquote,dl,dd{margin:0}
@@ -16,7 +18,9 @@ table{border-collapse:collapse;width:100%}
 iframe{max-width:100%;border:0}
 :focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:6px}
 
-/* ---------- 2. Tokens ---------- */
+/* =========================================================
+   2. Design Tokens
+   ========================================================= */
 :root{
   /* Brand */
   --brand:#FF5A00;
@@ -61,7 +65,9 @@ iframe{max-width:100%;border:0}
   --ease:cubic-bezier(.2,.7,.2,1);
 }
 
-/* ---------- 3. Base ---------- */
+/* =========================================================
+   3. Base
+   ========================================================= */
 html,body{background:var(--bg)}
 body{
   font-family:"IBM Plex Sans Arabic","Segoe UI",system-ui,-apple-system,sans-serif;
@@ -81,7 +87,9 @@ p{color:var(--ink-2)}
 strong{font-weight:700;color:var(--ink)}
 ::selection{background:var(--brand);color:#fff}
 
-/* ---------- 4. Layout ---------- */
+/* =========================================================
+   4. Layout
+   ========================================================= */
 .container{width:100%;max-width:var(--container);margin-inline:auto;padding-inline:22px}
 .section{padding:clamp(48px,7vw,92px) 0}
 .section-alt{background:var(--bg-2);border-block:1px solid var(--line)}
@@ -99,7 +107,9 @@ strong{font-weight:700;color:var(--ink)}
 .center{text-align:center}
 .mt-32{margin-top:32px}
 
-/* ---------- 5. Buttons ---------- */
+/* =========================================================
+   5. Buttons
+   ========================================================= */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:10px;
   padding:12px 22px;border-radius:var(--r-full);
@@ -130,9 +140,14 @@ strong{font-weight:700;color:var(--ink)}
 .link-more svg{transition:transform .2s var(--ease)}
 .link-more:hover svg{transform:translateX(-4px)}
 
-/* ---------- 6. Header ---------- */
+/* =========================================================
+   6. Header
+   ⚠️ ملاحظة: z-index أعلى من القائمة لتبقى فوقها
+   ========================================================= */
 .site-header{
-  position:sticky;top:0;z-index:100;
+  position:sticky;
+  top:0;
+  z-index:9999;
   background:rgba(255,255,255,.85);
   backdrop-filter:saturate(180%) blur(14px);
   -webkit-backdrop-filter:saturate(180%) blur(14px);
@@ -170,38 +185,98 @@ strong{font-weight:700;color:var(--ink)}
 .menu-btn[aria-expanded="true"] span::before{top:0;transform:rotate(45deg)}
 .menu-btn[aria-expanded="true"] span::after{top:0;transform:rotate(-45deg)}
 
-/* ---------- 7. Mobile menu ---------- */
+/* =========================================================
+   7. Mobile Menu — خارج الهيدر (containing block fix)
+   ⚠️ z-index أقل من الهيدر (9998 < 9999)
+   ========================================================= */
 .mobile-menu{
-  position:fixed;inset:var(--header-h) 0 0 0;background:#fff;
-  padding:22px;transform:translateY(-8px);opacity:0;pointer-events:none;
-  transition:opacity .22s var(--ease),transform .22s var(--ease);
-  overflow-y:auto;z-index:99;
+  position:fixed;
+  top:var(--header-h);
+  right:0;
+  bottom:0;
+  left:0;
+  background:#fff;
+  padding:22px;
+  transform:translateY(-8px);
+  opacity:0;
+  pointer-events:none;
+  visibility:hidden;
+  transition:opacity .22s var(--ease),
+             transform .22s var(--ease),
+             visibility 0s linear .22s;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  z-index:9998;
+  will-change:transform,opacity;
 }
-.mobile-menu.is-open{transform:translateY(0);opacity:1;pointer-events:auto}
+
+.mobile-menu.is-open{
+  transform:translateY(0);
+  opacity:1;
+  pointer-events:auto;
+  visibility:visible;
+  transition:opacity .22s var(--ease),
+             transform .22s var(--ease),
+             visibility 0s;
+}
+
 .mobile-menu nav{display:flex;flex-direction:column;gap:4px}
+
 .mobile-menu a{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:15px 16px;border-radius:var(--r);
-  font-weight:600;font-size:1.05rem;color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:15px 16px;
+  border-radius:var(--r);
+  font-weight:600;
+  font-size:1.05rem;
+  color:var(--ink);
   border-bottom:1px solid var(--line);
+  transition:background .18s,color .18s;
 }
 .mobile-menu a:hover{background:var(--bg-2);color:var(--brand)}
-.mobile-menu a svg{opacity:.35}
+.mobile-menu a svg{opacity:.35;transition:transform .2s}
+.mobile-menu a:hover svg{transform:translateX(-3px);opacity:.7}
 .mobile-menu .btn{margin-top:18px}
-.mobile-menu-foot{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.mobile-menu-foot{
+  margin-top:24px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
 body.menu-open{overflow:hidden}
 
-/* ---------- 8. Search overlay ---------- */
+/* =========================================================
+   8. Search Overlay — فوق كل شيء
+   ========================================================= */
 .search-overlay{
-  position:fixed;inset:0;background:rgba(10,10,10,.55);backdrop-filter:blur(6px);
-  z-index:200;display:flex;align-items:flex-start;justify-content:center;
-  padding:14vh 20px 20px;opacity:0;pointer-events:none;transition:opacity .22s var(--ease);
+  position:fixed;
+  inset:0;
+  background:rgba(10,10,10,.55);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  z-index:10000;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:14vh 20px 20px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s var(--ease);
 }
 .search-overlay.is-open{opacity:1;pointer-events:auto}
 .search-panel{
-  width:100%;max-width:640px;background:#fff;border-radius:var(--r-lg);
-  box-shadow:var(--sh-3);overflow:hidden;
-  transform:translateY(-12px);transition:transform .25s var(--ease);
+  width:100%;
+  max-width:640px;
+  background:#fff;
+  border-radius:var(--r-lg);
+  box-shadow:var(--sh-3);
+  overflow:hidden;
+  transform:translateY(-12px);
+  transition:transform .25s var(--ease);
 }
 .search-overlay.is-open .search-panel{transform:translateY(0)}
 .search-field{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}
@@ -211,7 +286,9 @@ body.menu-open{overflow:hidden}
 .search-close{color:var(--muted);font-size:.8rem;padding:6px 10px;border:1px solid var(--line);border-radius:6px}
 .search-tips{padding:14px 22px 20px;font-size:.85rem;color:var(--muted)}
 
-/* ---------- 9. Hero ---------- */
+/* =========================================================
+   9. Hero
+   ========================================================= */
 .hero{
   position:relative;overflow:hidden;
   padding:clamp(46px,7vw,84px) 0 clamp(56px,8vw,100px);
@@ -256,7 +333,9 @@ body.menu-open{overflow:hidden}
 }
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
-/* ---------- 10. Post card ---------- */
+/* =========================================================
+   10. Post Card
+   ========================================================= */
 .card{
   display:flex;flex-direction:column;background:#fff;
   border:1px solid var(--line);border-radius:var(--r-lg);
@@ -278,7 +357,6 @@ body.menu-open{overflow:hidden}
 .card-author{display:flex;align-items:center;gap:8px}
 .card-author img,.card-author .av-fallback{width:26px;height:26px;border-radius:50%;object-fit:cover;background:var(--brand-50);color:var(--brand);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem}
 
-/* Featured (first card larger) */
 .grid-featured .card:first-child{grid-column:span 2;grid-row:span 1}
 .grid-featured .card:first-child .card-media{aspect-ratio:16/9}
 .grid-featured .card:first-child .card-title{font-size:1.5rem}
@@ -292,12 +370,13 @@ body.menu-open{overflow:hidden}
 }
 .badge-brand{background:var(--brand);color:#fff}
 
-/* Compact horizontal card */
 .card-row{flex-direction:row;align-items:stretch}
 .card-row .card-media{width:180px;aspect-ratio:auto;flex-shrink:0}
 .card-row .card-body{padding:16px}
 
-/* ---------- 11. Sidebar ---------- */
+/* =========================================================
+   11. Sidebar
+   ========================================================= */
 .sidebar{display:flex;flex-direction:column;gap:22px;position:sticky;top:calc(var(--header-h) + 20px)}
 .widget{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:22px}
 .widget-title{display:flex;align-items:center;gap:10px;font-size:1rem;font-weight:700;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)}
@@ -324,7 +403,9 @@ body.menu-open{overflow:hidden}
 .widget-cta p{color:rgba(255,255,255,.72);font-size:.88rem;margin-bottom:16px;line-height:1.7}
 .widget-cta .btn-brand{box-shadow:none}
 
-/* ---------- 12. Category grid ---------- */
+/* =========================================================
+   12. Category grid
+   ========================================================= */
 .cat-card{
   display:flex;flex-direction:column;gap:10px;padding:26px 22px;
   background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);
@@ -341,7 +422,9 @@ body.menu-open{overflow:hidden}
 .cat-card p{font-size:.85rem;color:var(--muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cat-count{font-size:.78rem;font-weight:600;color:var(--brand);margin-top:auto;padding-top:8px}
 
-/* ---------- 13. Author box ---------- */
+/* =========================================================
+   13. Author box
+   ========================================================= */
 .author-box{
   display:grid;grid-template-columns:220px 1fr;gap:40px;align-items:center;
   padding:clamp(28px,4vw,44px);
@@ -360,7 +443,9 @@ body.menu-open{overflow:hidden}
 .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
 .chip{padding:6px 13px;background:#fff;border:1px solid var(--line);border-radius:var(--r-full);font-size:.8rem;font-weight:600;color:var(--ink-2)}
 
-/* ---------- 14. CTA band ---------- */
+/* =========================================================
+   14. CTA band
+   ========================================================= */
 .cta-band{
   display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap;
   padding:clamp(30px,4vw,48px);
@@ -378,7 +463,9 @@ body.menu-open{overflow:hidden}
 .cta-band .btn-dark{position:relative;background:#0A0A0A}
 .cta-band .btn-dark:hover{background:#262629}
 
-/* ---------- 15. Newsletter ---------- */
+/* =========================================================
+   15. Newsletter
+   ========================================================= */
 .newsletter{
   max-width:640px;margin-inline:auto;text-align:center;
   padding:clamp(30px,4vw,48px);background:var(--bg-2);
@@ -397,7 +484,9 @@ body.menu-open{overflow:hidden}
 .form-note.is-error{color:#D32F2F}
 .form-note.is-ok{color:#2E7D32}
 
-/* ---------- 16. Article page ---------- */
+/* =========================================================
+   16. Article page
+   ========================================================= */
 .article-head{padding-top:clamp(24px,4vw,44px);padding-bottom:26px;border-bottom:1px solid var(--line)}
 .breadcrumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-bottom:20px}
 .breadcrumb a{color:var(--muted);font-weight:500}
@@ -499,13 +588,17 @@ body.menu-open{overflow:hidden}
 .author-card h4{font-size:1rem;margin-bottom:4px}
 .author-card p{font-size:.88rem;color:var(--muted);line-height:1.7}
 
-/* ---------- 17. Page head ---------- */
+/* =========================================================
+   17. Page head
+   ========================================================= */
 .page-head{padding:clamp(40px,6vw,72px) 0 clamp(28px,4vw,44px);background:var(--bg-2);border-bottom:1px solid var(--line)}
 .page-head h1{font-size:clamp(1.8rem,4vw,2.6rem)}
 .page-head p{color:var(--muted);margin-top:12px;max-width:62ch;font-size:1.02rem}
 .page-head .breadcrumb{margin-bottom:16px}
 
-/* ---------- 18. Search page ---------- */
+/* =========================================================
+   18. Search page
+   ========================================================= */
 .search-hero{background:var(--ink);color:#fff;padding:clamp(40px,6vw,72px) 0}
 .search-hero h1{color:#fff}
 .search-hero p{color:rgba(255,255,255,.7);margin-top:10px}
@@ -525,7 +618,9 @@ body.menu-open{overflow:hidden}
 .empty-state h2{font-size:1.4rem;margin-bottom:10px}
 .empty-state p{color:var(--muted);max-width:48ch;margin-inline:auto}
 
-/* ---------- 19. Forms / Contact ---------- */
+/* =========================================================
+   19. Forms / Contact
+   ========================================================= */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .field{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
 .field label{font-size:.88rem;font-weight:600;color:var(--ink)}
@@ -543,7 +638,9 @@ body.menu-open{overflow:hidden}
 .contact-item p,.contact-item a{font-size:.9rem;color:var(--muted)}
 .contact-item a:hover{color:var(--brand)}
 
-/* ---------- 20. Footer ---------- */
+/* =========================================================
+   20. Footer
+   ========================================================= */
 .site-footer{background:var(--ink);color:rgba(255,255,255,.72);margin-top:40px;padding-top:64px}
 .footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr;gap:44px;padding-bottom:48px}
 .footer-brand .brand-logo{filter:brightness(0) invert(1);height:42px;margin-bottom:16px}
@@ -562,7 +659,9 @@ body.menu-open{overflow:hidden}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding:24px 0;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:.85rem}
 .footer-bottom a{color:var(--brand)}
 
-/* ---------- 21. Pagination ---------- */
+/* =========================================================
+   21. Pagination
+   ========================================================= */
 .pagination{display:flex;justify-content:center;gap:8px;margin-top:44px;flex-wrap:wrap}
 .pagination a,.pagination span{
   min-width:42px;height:42px;padding:0 14px;
@@ -574,7 +673,9 @@ body.menu-open{overflow:hidden}
 .pagination .is-current{background:var(--brand);border-color:var(--brand);color:#fff}
 .pagination .is-disabled{opacity:.4;pointer-events:none}
 
-/* ---------- 22. Utilities ---------- */
+/* =========================================================
+   22. Utilities
+   ========================================================= */
 .empty-inline{color:var(--muted);font-size:.92rem;padding:20px 0}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 .av-fallback{
@@ -582,7 +683,9 @@ body.menu-open{overflow:hidden}
   background:var(--brand-50);color:var(--brand);font-weight:700;
 }
 
-/* ---------- 23. Responsive ---------- */
+/* =========================================================
+   23. Responsive
+   ========================================================= */
 @media (max-width:1024px){
   .layout-2col{grid-template-columns:1fr}
   .sidebar{position:static}
@@ -593,6 +696,7 @@ body.menu-open{overflow:hidden}
   .contact-grid{grid-template-columns:1fr}
   .grid-cats{grid-template-columns:repeat(2,1fr)}
 }
+
 @media (max-width:860px){
   .nav-desktop{display:none}
   .menu-btn{display:inline-flex}
@@ -606,6 +710,7 @@ body.menu-open{overflow:hidden}
   .chip-row{justify-content:center}
   .hero-actions{justify-content:flex-start}
 }
+
 @media (max-width:640px){
   :root{--header-h:64px}
   .container{padding-inline:18px}
@@ -622,6 +727,10 @@ body.menu-open{overflow:hidden}
   .hero-stats{gap:22px}
   .stat b{font-size:1.35rem}
 }
+
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    transition-duration:.01ms!important;
+  }
 }
