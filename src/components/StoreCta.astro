@@ -1,0 +1,35 @@
+---
+import { SITE } from "@/lib/config";
+import Icon from "./Icon.astro";
+
+type Props = { variant?: "inline" | "block" };
+const { variant = "block" } = Astro.props;
+---
+{variant === "block" ? (
+  <aside class="my-12 overflow-hidden rounded-3xl bg-ink-900 p-8 text-white md:p-10">
+    <div class="max-w-xl">
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand-300">هل تحتاج مساعدة؟</p>
+      <h2 class="mt-2 text-2xl font-bold leading-snug md:text-3xl">
+        تحتاج إلى تحسين موقعك أو تطوير مشروعك الرقمي؟
+      </h2>
+      <p class="mt-3 text-white/70">
+        تعرّف على خدمات {SITE.name} — استشارات، تنفيذ، وتحسين محركات البحث.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href={SITE.servicesUrl} target="_blank" rel="noopener"
+          class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-600">
+          استعرض الخدمات <Icon name="arrowLeft" size={16} />
+        </a>
+        <a href={SITE.mainSite} target="_blank" rel="noopener"
+          class="inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white ring-1 ring-white/15 transition-colors hover:bg-white/20">
+          زيارة الموقع
+        </a>
+      </div>
+    </div>
+  </aside>
+) : (
+  <a href={SITE.servicesUrl} target="_blank" rel="noopener"
+    class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-600">
+    استعرض الخدمات <Icon name="arrowLeft" size={16} />
+  </a>
+)}
