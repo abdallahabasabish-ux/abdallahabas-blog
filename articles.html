@@ -11,8 +11,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .skel{position:relative;overflow:hidden;background:var(--bg-3);border-radius:12px}
+  .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:skel 1.3s infinite}
+  @keyframes skel{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .skel-card{height:340px}
+  #pageLoader{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+  #pageLoader.is-hidden{opacity:0;pointer-events:none}
+  .loader-ring{width:44px;height:44px;border:3px solid var(--brand-50);border-top-color:var(--brand);border-radius:50%;animation:ring .8s linear infinite}
+  @keyframes ring{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body data-page="articles">
+
+<div id="pageLoader"><div class="loader-ring" role="status" aria-label="جارٍ التحميل"></div></div>
 
 <div id="app-header"></div>
 
@@ -32,11 +44,14 @@
   <section class="section">
     <div class="container">
       <div class="search-summary">
-        <div><strong id="countNum">0</strong> <span id="countLabel">مقال</span></div>
+        <div><strong id="countNum">—</strong> <span id="countLabel">مقال</span></div>
         <div class="result-count" id="sortInfo">مرتبة حسب: الأحدث</div>
       </div>
 
-      <div class="grid grid-2" id="articlesGrid" style="gap:28px"></div>
+      <div class="grid grid-2" id="articlesGrid" style="gap:28px">
+        <div class="skel skel-card"></div><div class="skel skel-card"></div>
+        <div class="skel skel-card"></div><div class="skel skel-card"></div>
+      </div>
       <div id="pagination" class="pagination" role="navigation" aria-label="ترقيم الصفحات"></div>
     </div>
   </section>
@@ -46,9 +61,26 @@
 
 <script src="assets/js/data.js"></script>
 <script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const PER_PAGE = 6;
+<script type="module">
+import "./assets/js/firebase-data.js";
+
+const PER_PAGE = 6;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await AAB.firebaseReady();
+  } catch (e) {
+    console.warn('[articles] Firebase unavailable, using cache.', e);
+  }
+
+  AAB.renderHeader();
+  AAB.renderFooter();
+  renderArticlesPage();
+
+  document.getElementById('pageLoader')?.classList.add('is-hidden');
+});
+
+function renderArticlesPage() {
   const params = new URLSearchParams(location.search);
   let page = Math.max(1, parseInt(params.get('page') || '1', 10));
 
@@ -62,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('countNum').textContent = total;
 
   const grid = document.getElementById('articlesGrid');
+
   if (!slice.length) {
     grid.outerHTML = `
       <div class="empty-state">
@@ -69,13 +102,13 @@ document.addEventListener('DOMContentLoaded', function () {
         <h2>لا توجد مقالات بعد</h2>
         <p>سيتم نشر أول مقال قريبًا. عُد لاحقًا.</p>
       </div>`;
-    return;
+  } else {
+    grid.innerHTML = slice.map(p => AAB.postCard(p)).join('');
   }
-  grid.innerHTML = slice.map(p => AAB.postCard(p)).join('');
 
-  /* Pagination */
+  /* --- Pagination --- */
+  const pag = document.getElementById('pagination');
   if (pages > 1) {
-    const el = document.getElementById('pagination');
     const items = [];
     const qs = (n) => n === 1 ? 'articles.html' : `articles.html?page=${n}`;
 
@@ -97,10 +130,12 @@ document.addEventListener('DOMContentLoaded', function () {
       ? `<a href="${qs(page+1)}" aria-label="التالي">التالي</a>`
       : `<span class="is-disabled">التالي</span>`);
 
-    el.innerHTML = items.join('');
+    pag.innerHTML = items.join('');
+  } else {
+    pag.innerHTML = '';
   }
 
-  /* SEO */
+  /* --- SEO --- */
   const db = AAB.DB.get();
   AAB.setSEO({
     title: `جميع المقالات (${total}) — ${db.settings.siteName}`,
@@ -108,15 +143,15 @@ document.addEventListener('DOMContentLoaded', function () {
     canonical: AAB.SITE + '/articles.html' + (page > 1 ? '?page=' + page : ''),
     type: 'website',
     schema: {
-      "@context":"https://schema.org",
-      "@type":"CollectionPage",
-      "name":"جميع المقالات",
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "جميع المقالات",
       "url": AAB.SITE + '/articles.html',
-      "inLanguage":"ar",
-      "isPartOf": { "@type":"Blog", "name": db.settings.siteName, "url": AAB.SITE + '/' }
+      "inLanguage": "ar",
+      "isPartOf": { "@type": "Blog", "name": db.settings.siteName, "url": AAB.SITE + '/' }
     }
   });
-});
+}
 </script>
 </body>
 </html>
