@@ -1,0 +1,38 @@
+{
+  "name": "مدونة Abdallah Abas",
+  "short_name": "AAB Blog",
+  "description": "مقالات عملية في تطوير الويب، تحسين محركات البحث، وتصميم الواجهات.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FF5A00",
+  "categories": ["education", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/assets/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "أحدث المقالات",
+      "url": "/articles.html"
+    },
+    {
+      "name": "بحث",
+      "url": "/search.html"
+    }
+  ]
+}
