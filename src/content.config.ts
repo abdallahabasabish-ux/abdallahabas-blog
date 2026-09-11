@@ -1,12 +1,12 @@
 import { defineCollection, z, reference } from "astro:content";
-import { glob, file } from "astro/loaders";
+import { glob } from "astro/loaders";
 
 const posts = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/posts" }),
   schema: z.object({
-    title: z.string(),
+    title: z.string().min(4).max(120),
     slug: z.string().optional(),
-    excerpt: z.string().max(300),
+    excerpt: z.string().min(20).max(320),
     cover: z.string(),
     coverAlt: z.string().min(4),
     category: reference("categories"),
@@ -16,18 +16,15 @@ const posts = defineCollection({
     updatedAt: z.coerce.date().optional(),
     status: z.enum(["draft", "published", "scheduled", "archived"]).default("draft"),
     featured: z.boolean().default(false),
-    pinned: z.boolean().default(false),
 
-    // SEO
-    metaTitle: z.string().max(60).optional(),
-    metaDescription: z.string().max(160).optional(),
+    metaTitle: z.string().max(70).optional(),
+    metaDescription: z.string().max(170).optional(),
     focusKeyword: z.string().optional(),
     secondaryKeywords: z.array(z.string()).default([]),
     canonicalUrl: z.string().url().optional(),
     noindex: z.boolean().default(false),
     ogImage: z.string().optional(),
 
-    // محتوى منظم
     faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
     toc: z.boolean().default(true),
   }),
