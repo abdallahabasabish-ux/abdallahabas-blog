@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة التحكم — مدونة Abdallah Abas</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="../assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .admin-wrap{display:grid;grid-template-columns:240px 1fr;min-height:100vh;background:var(--bg-2)}
+  .admin-side{background:var(--ink);color:#fff;padding:22px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .admin-side .brand{margin-bottom:26px}
+  .admin-side .brand-logo{filter:brightness(0) invert(1)}
+  .admin-nav{display:flex;flex-direction:column;gap:2px}
+  .admin-nav button{
+    text-align:start;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,.75);
+    font-size:.92rem;font-weight:500;transition:.15s;display:flex;align-items:center;gap:10px;
+  }
+  .admin-nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+  .admin-nav button.is-active{background:var(--brand);color:#fff}
+  .admin-side .side-foot{margin-top:26px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:8px}
+  .admin-side .side-foot a{color:rgba(255,255,255,.55);font-size:.85rem}
+  .admin-side .side-foot a:hover{color:#fff}
+
+  .admin-main{padding:32px 36px;max-width:1200px}
+  .admin-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:28px;flex-wrap:wrap}
+  .admin-head h1{font-size:1.7rem}
+  .admin-head p{color:var(--muted);margin-top:6px;font-size:.92rem}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+  .stat-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:20px}
+  .stat-card b{display:block;font-size:1.7rem;font-weight:700;line-height:1;color:var(--ink)}
+  .stat-card span{display:block;font-size:.85rem;color:var(--muted);margin-top:8px}
+  .stat-card .ico{width:36px;height:36px;border-radius:10px;background:var(--brand-50);color:var(--brand);display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;margin-bottom:22px}
+  .panel h2{font-size:1.15rem;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .panel-head h2{margin:0;padding:0;border:0}
+
+  table.admin-table{width:100%;border-collapse:collapse;font-size:.92rem}
+  .admin-table th{text-align:start;padding:12px 14px;background:var(--bg-2);font-weight:600;font-size:.83rem;color:var(--muted);border-bottom:1px solid var(--line)}
+  .admin-table td{padding:14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .admin-table tr:last-child td{border-bottom:0}
+  .admin-table tr:hover td{background:var(--bg-2)}
+  .t-actions{display:flex;gap:6px;justify-content:flex-end}
+  .t-btn{padding:6px 12px;border-radius:8px;font-size:.8rem;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink-2);transition:.15s}
+  .t-btn:hover{border-color:var(--ink);color:var(--ink)}
+  .t-btn.danger:hover{border-color:#D32F2F;color:#D32F2F}
+  .t-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .t-btn.primary:hover{background:var(--brand-600);border-color:var(--brand-600)}
+
+  .badge-status{display:inline-flex;padding:3px 10px;border-radius:var(--r-full);font-size:.72rem;font-weight:700}
+  .badge-status.published{background:#E8F5E9;color:#2E7D32}
+  .badge-status.draft{background:#F5F5F5;color:#616161}
+  .badge-status.scheduled{background:#FFF3E0;color:#E65100}
+  .badge-status.archived{background:#ECEFF1;color:#455A64}
+
+  .form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+  .form-actions .btn{min-width:120px}
+
+  .editor-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:var(--bg-2);border:1.5px solid var(--line);border-bottom:0;border-radius:var(--r) var(--r) 0 0}
+  .editor-toolbar button{
+    padding:7px 11px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--ink-2);transition:.15s;
+  }
+  .editor-toolbar button:hover{background:#fff;color:var(--brand)}
+  .editor-area{
+    border:1.5px solid var(--line);border-radius:0 0 var(--r) var(--r);
+    padding:20px;min-height:340px;background:#fff;outline:0;font-size:1rem;line-height:1.85;
+  }
+  .editor-area:focus{border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-50)}
+  .editor-area h2{font-size:1.35rem;margin:1.2em 0 .5em}
+  .editor-area h3{font-size:1.15rem;margin:1.1em 0 .4em}
+  .editor-area p{margin:0 0 1em}
+
+  .tag-input{display:flex;flex-wrap:wrap;gap:8px;padding:8px;border:1.5px solid var(--line);border-radius:var(--r);min-height:46px;background:#fff}
+  .tag-input input{flex:1;min-width:100px;border:0;outline:0;padding:6px 8px}
+  .tag-input .tg{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--brand-50);color:var(--brand-700);border-radius:var(--r-full);font-size:.82rem;font-weight:600}
+  .tag-input .tg button{color:var(--brand-700);font-size:.9rem}
+
+  .login-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,var(--brand) 0%,#FF7A18 100%);padding:20px}
+  .login-card{width:100%;max-width:400px;background:#fff;padding:36px 32px;border-radius:var(--r-xl);box-shadow:var(--sh-3)}
+  .login-card h1{font-size:1.4rem;text-align:center;margin-bottom:6px}
+  .login-card p{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:24px}
+
+  @media (max-width:900px){
+    .admin-wrap{grid-template-columns:1fr}
+    .admin-side{position:static;height:auto;padding:16px}
+    .admin-side .admin-nav{flex-direction:row;overflow-x:auto;gap:4px}
+    .admin-side .admin-nav button{white-space:nowrap;padding:9px 12px}
+    .admin-side .side-foot{display:none}
+    .admin-main{padding:22px}
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .form-grid{grid-template-columns:1fr}
+    .admin-table{font-size:.85rem}
+    .admin-table th,.admin-table td{padding:10px 8px}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView" class="login-shell">
+  <form class="login-card" id="loginForm">
+    <h1>لوحة التحكم</h1>
+    <p>مدونة Abdallah Abas</p>
+    <div class="field">
+      <label for="luser">اسم المستخدم</label>
+      <input id="luser" name="user" type="text" required autocomplete="username" placeholder="admin">
+    </div>
+    <div class="field">
+      <label for="lpass">كلمة المرور</label>
+      <input id="lpass" name="pass" type="password" required autocomplete="current-password" placeholder="admin">
+    </div>
+    <button type="submit" class="btn btn-brand btn-block btn-lg">تسجيل الدخول</button>
+    <p class="form-note" id="loginNote"></p>
+    <p style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:14px">
+      بيانات تجريبية: <b>admin / admin</b>
+    </p>
+  </form>
+</div>
+
+<!-- ADMIN -->
+<div class="admin-wrap" id="adminView" hidden>
+  <aside class="admin-side">
+    <a href="../index.html" class="brand"><img class="brand-logo" src="../assets/img/logo.svg" alt="Abdallah Abas"></a>
+    <nav class="admin-nav" id="adminNav">
+      <button data-view="dashboard" class="is-active">📊 لوحة القيادة</button>
+      <button data-view="posts">📝 المقالات</button>
+      <button data-view="editor">✏️ مقال جديد</button>
+      <button data-view="categories">🗂️ التصنيفات</button>
+      <button data-view="tags">🏷️ الوسوم</button>
+      <button data-view="author">👤 الكاتب</button>
+      <button data-view="settings">⚙️ الإعدادات</button>
+      <button data-view="subscribers">📬 المشتركون</button>
+    </nav>
+    <div class="side-foot">
+      <a href="../index.html" target="_blank">↗ عرض المدونة</a>
+      <a href="#" id="logoutBtn">↩ تسجيل الخروج</a>
+      <a href="#" id="resetDbBtn" style="color:#FF9B7A">⚠ إعادة تعيين البيانات</a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div id="viewRoot"></div>
+  </main>
+</div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  const SESSION_KEY = 'aab_admin_session';
+  const CREDS = { user: 'admin', pass: 'admin' };
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const esc = AAB.esc;
+
+  /* ---------- Auth ---------- */
+  function isLogged() { return sessionStorage.getItem(SESSION_KEY) === '1'; }
+  function login(u, p) {
+    if (u === CREDS.user && p === CREDS.pass) { sessionStorage.setItem(SESSION_KEY, '1'); return true; }
+    return false;
+  }
+  function logout() { sessionStorage.removeItem(SESSION_KEY); location.reload(); }
+
+  /* ---------- Router ---------- */
+  let currentView = 'dashboard';
+  let editingPostId = null;
+
+  function showLogin() {
+    $('#loginView').hidden = false;
+    $('#adminView').hidden = true;
+  }
+  function showAdmin() {
+    $('#loginView').hidden = true;
+    $('#adminView').hidden = false;
+    renderView(currentView);
+  }
+
+  /* ---------- Views ---------- */
+  function renderView(view) {
+    currentView = view;
+    $$('#adminNav button').forEach(b => b.classList.toggle('is-active', b.dataset.view === view));
+    const root = $('#viewRoot');
+    if (view === 'dashboard') root.innerHTML = viewDashboard();
+    else if (view === 'posts') root.innerHTML = viewPosts();
+    else if (view === 'editor') root.innerHTML = viewEditor();
+    else if (view === 'categories') root.innerHTML = viewCategories();
+    else if (view === 'tags') root.innerHTML = viewTags();
+    else if (view === 'author') root.innerHTML = viewAuthor();
+    else if (view === 'settings') root.innerHTML = viewSettings();
+    else if (view === 'subscribers') root.innerHTML = viewSubscribers();
+    bindView(view);
+  }
+
+  /* ================= DASHBOARD ================= */
+  function viewDashboard() {
+    const db = AAB.DB.get();
+    const pub = AAB.published();
+    const drafts = db.posts.filter(p => p.status === 'draft').length;
+    const subs = (db.subscribers || []).length;
+    const totalViews = pub.reduce((s, p) => s + (p.views || 0), 0);
+
+    return `
+      <div class="admin-head">
+        <div><h1>لوحة القيادة</h1><p>نظرة عامة على محتوى المدونة</p></div>
+        <button class="btn btn-brand" data-action="new-post">+ مقال جديد</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="ico">📝</span><b>${pub.length}</b><span>مقال منشور</span></div>
+        <div class="stat-card"><span class="ico">📄</span><b>${drafts}</b><span>مسودة</span></div>
+        <div class="stat-card"><span class="ico">👁️</span><b>${AAB.compactNum(totalViews)}</b><span>إجمالي القراءات</span></div>
+        <div class="stat-card"><span class="ico">📬</span><b>${subs}</b><span>مشترك في النشرة</span></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>أحدث المقالات</h2>
+          <button class="btn btn-outline btn-sm" data-action="goto-posts">عرض الكل</button></div>
+        <table class="admin-table">
+          <thead><tr><th>العنوان</th><th>التصنيف</th><th>الحالة</th><th>المشاهدات</th><th></th></tr></thead>
+          <tbody>
+            ${db.posts.slice(0, 8).map(p => {
+              const cat = AAB.getCategory(p.categoryId) || {};
+              return `<tr>
+                <td><b>${esc(p.title)}</b></td>
+                <td>${esc(cat.name || '—')}</td>
+                <td><span class="badge-status ${p.status}">${statusLabel(p.status)}</span></td>
+                <td>${AAB.compactNum(p.views || 0)}</td>
+                <td><div class="t-actions">
+                  <button class="t-btn" data-action="edit-post" data-id="${p.id}">تعديل</button>
+                </div></td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="5" class="empty-inline">لا توجد مقالات.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  /* ================= POSTS ================= */
+  function viewPosts() {
+    const db = AAB.DB.get();
+    return `
+      <div class="admin-head">
+        <div><h1>المقالات</h1><p>إدارة كل مقالات المدونة</p></div>
+        <button class="btn btn-brand" data-action="new-post">+ مقال جديد</button>
+      </div>
+      <div class="panel">
+        <table class="admin-table">
+          <thead><tr><th>العنوان</th><th>Slug</th><th>التصنيف</th><th>الحالة</th><th>مميز</th><th>المشاهدات</th><th>التاريخ</th><th></th></tr></thead>
+          <tbody>
+            ${db.posts.map(p => {
+              const cat = AAB.getCategory(p.categoryId) || {};
+              return `<tr>
+                <td><b>${esc(p.title)}</b></td>
+                <td><code style="font-size:.8rem;color:var(--muted)">${esc(p.slug)}</code></td>
+                <td>${esc(cat.name || '—')}</td>
+                <td><span class="badge-status ${p.status}">${statusLabel(p.status)}</span></td>
+                <td>${p.featured ? '⭐' : '—'}</td>
+                <td>${AAB.compactNum(p.views || 0)}</td>
+                <td>${AAB.formatDate(p.publishedAt)}</td>
+                <td><div class="t-actions">
+                  <button class="t-btn" data-action="edit-post" data-id="${p.id}">تعديل</button>
+                  <button class="t-btn danger" data-action="delete-post" data-id="${p.id}">حذف</button>
+                </div></td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="8" class="empty-inline">لا توجد مقالات بعد.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function statusLabel(s) {
+    return { published: 'منشور', draft: 'مسودة', scheduled: 'مجدول', archived: 'مؤرشف' }[s] || s;
+  }
+
+  /* ================= EDITOR ================= */
+  function viewEditor() {
+    const db = AAB.DB.get();
+    const p = editingPostId ? db.posts.find(x => x.id === editingPostId) : null;
+    const isEdit = !!p;
+    const data = p || {
+      title: '', slug: '', excerpt: '', content: '', cover: '',
+      categoryId: db.categories[0]?.id || '', tagIds: [], status: 'draft',
+      featured: false, metaTitle: '', metaDescription: '', focusKeyword: '',
+      keywords: [], canonical: '', faq: []
+    };
+    const d = new Date();
+    const dateVal = (data.publishedAt ? new Date(data.publishedAt) : d).toISOString().slice(0, 10);
+
+    return `
+      <div class="admin-head">
+        <div><h1>${isEdit ? 'تعديل مقال' : 'مقال جديد'}</h1>
+        <p>${isEdit ? 'تحديث محتوى المقال' : 'أضف مقالًا جديدًا للمدونة'}</p></div>
+        <div style="display:flex;gap:8px">
+          ${isEdit ? `<a href="../article.html?slug=${encodeURIComponent(data.slug)}" target="_blank" class="btn btn-outline">معاينة</a>` : ''}
+          <button class="btn btn-ghost" data-action="cancel-edit">إلغاء</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>المحتوى الأساسي</h2>
+        <div class="field">
+          <label>عنوان المقال *</label>
+          <input id="f-title" type="text" value="${esc(data.title)}" placeholder="عنوان واضح وجاذب" data-autoslug>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Slug (الرابط)</label>
+            <input id="f-slug" type="text" value="${esc(data.slug)}" placeholder="my-article-slug">
+          </div>
+          <div class="field">
+            <label>التصنيف *</label>
+            <select id="f-category">
+              ${db.categories.map(c => `<option value="${c.id}" ${c.id === data.categoryId ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>وصف مختصر (Excerpt)</label>
+          <textarea id="f-excerpt" style="min-height:80px" placeholder="سطر أو سطران يظهران في القوائم ونتائج البحث">${esc(data.excerpt)}</textarea>
+        </div>
+        <div class="field">
+          <label>الصورة الرئيسية (URL)</label>
+          <input id="f-cover" type="text" value="${esc(data.cover)}" placeholder="https://...">
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>محتوى المقال</h2>
+        <div class="editor-toolbar">
+          <button type="button" data-cmd="h2">H2</button>
+          <button type="button" data-cmd="h3">H3</button>
+          <button type="button" data-cmd="bold"><b>B</b></button>
+          <button type="button" data-cmd="italic"><i>I</i></button>
+          <button type="button" data-cmd="ul">• قائمة</button>
+          <button type="button" data-cmd="ol">1. قائمة</button>
+          <button type="button" data-cmd="quote">❝ اقتباس</button>
+          <button type="button" data-cmd="link">🔗 رابط</button>
+          <button type="button" data-cmd="img">🖼️ صورة</button>
+          <button type="button" data-cmd="hr">― فاصل</button>
+          <button type="button" data-cmd="code">&lt;/&gt; كود</button>
+        </div>
+        <div class="editor-area" id="f-content" contenteditable="true">${data.content || ''}</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:10px">
+          💡 المحرر يقبل HTML مباشرة. استخدم H2 و H3 لبناء فهرس المقال تلقائيًا.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h2>SEO</h2>
+        <div class="field">
+          <label>Meta Title</label>
+          <input id="f-metaTitle" type="text" value="${esc(data.metaTitle || '')}" placeholder="عنوان يظهر في نتائج البحث (≤ 60 حرفًا)">
+        </div>
+        <div class="field">
+          <label>Meta Description</label>
+          <textarea id="f-metaDescription" style="min-height:70px" placeholder="وصف مختصر يظهر في نتائج البحث (≤ 160 حرفًا)">${esc(data.metaDescription || '')}</textarea>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>الكلمة المفتاحية الأساسية</label>
+            <input id="f-focusKeyword" type="text" value="${esc(data.focusKeyword || '')}" placeholder="مثال: مدونة عربية سريعة">
+          </div>
+          <div class="field">
+            <label>Canonical URL (اختياري)</label>
+            <input id="f-canonical" type="text" value="${esc(data.canonical || '')}" placeholder="اتركه فارغًا للافتراضي">
+          </div>
+        </div>
+        <div class="field">
+          <label>كلمات مفتاحية ثانوية (مفصولة بفاصلة)</label>
+          <input id="f-keywords" type="text" value="${esc((data.keywords || []).join(', '))}" placeholder="SEO, أداء, RTL">
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>الوسوم</h2>
+        <div class="tag-input" id="tagBox">
+          ${(data.tagIds || []).map(id => {
+            const t = AAB.getTag(id);
+            return t ? `<span class="tg" data-tagid="${t.id}">${esc(t.name)}<button type="button" data-rmtag="${t.id}">×</button></span>` : '';
+          }).join('')}
+          <input id="tagInput" type="text" placeholder="أضف وسمًا واضغط Enter">
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>النشر</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label>الحالة</label>
+            <select id="f-status">
+              <option value="draft" ${data.status === 'draft' ? 'selected' : ''}>مسودة</option>
+              <option value="published" ${data.status === 'published' ? 'selected' : ''}>منشور</option>
+              <option value="scheduled" ${data.status === 'scheduled' ? 'selected' : ''}>مجدول</option>
+              <option value="archived" ${data.status === 'archived' ? 'selected' : ''}>مؤرشف</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>تاريخ النشر</label>
+            <input id="f-publishedAt" type="date" value="${dateVal}">
+          </div>
+        </div>
+        <div class="field" style="flex-direction:row;align-items:center;gap:10px">
+          <input type="checkbox" id="f-featured" ${data.featured ? 'checked' : ''} style="width:auto">
+          <label for="f-featured" style="font-weight:600">مقال مميز (يظهر في القسم الرئيسي)</label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-brand" data-action="save-post" data-id="${data.id || ''}">
+          ${isEdit ? 'حفظ التعديلات' : 'نشر المقال'}
+        </button>
+        <button class="btn btn-outline" data-action="save-draft" data-id="${data.id || ''}">حفظ كمسودة</button>
+      </div>
+      <p class="form-note" id="editorNote"></p>
+    `;
+  }
+
+  /* ================= CATEGORIES ================= */
+  function viewCategories() {
+    const db = AAB.DB.get();
+    return `
+      <div class="admin-head">
+        <div><h1>التصنيفات</h1><p>إدارة تصنيفات المقالات</p></div>
+        <button class="btn btn-brand" data-action="new-category">+ تصنيف جديد</button>
+      </div>
+      <div class="panel">
+        <table class="admin-table">
+          <thead><tr><th>الاسم</th><th>Slug</th><th>الوصف</th><th>الترتيب</th><th>عدد المقالات</th><th></th></tr></thead>
+          <tbody>
+            ${db.categories.slice().sort((a,b) => a.order - b.order).map(c => {
+              const n = db.posts.filter(p => p.categoryId === c.id).length;
+              return `<tr>
+                <td><b>${esc(c.name)}</b></td>
+                <td><code style="font-size:.8rem;color:var(--muted)">${esc(c.slug)}</code></td>
+                <td style="font-size:.85rem;color:var(--muted);max-width:280px">${esc((c.description || '').slice(0, 80))}${(c.description || '').length > 80 ? '…' : ''}</td>
+                <td>${c.order}</td>
+                <td>${n}</td>
+                <td><div class="t-actions">
+                  <button class="t-btn" data-action="edit-category" data-id="${c.id}">تعديل</button>
+                  <button class="t-btn danger" data-action="delete-category" data-id="${c.id}">حذف</button>
+                </div></td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="6" class="empty-inline">لا توجد تصنيفات.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  /* ================= TAGS ================= */
+  function viewTags() {
+    const db = AAB.DB.get();
+    return `
+      <div class="admin-head">
+        <div><h1>الوسوم</h1><p>إدارة وسوم المقالات</p></div>
+        <button class="btn btn-brand" data-action="new-tag">+ وسم جديد</button>
+      </div>
+      <div class="panel">
+        <table class="admin-table">
+          <thead><tr><th>الاسم</th><th>Slug</th><th>عدد المقالات</th><th></th></tr></thead>
+          <tbody>
+            ${db.tags.map(t => {
+              const n = db.posts.filter(p => (p.tagIds || []).includes(t.id)).length;
+              return `<tr>
+                <td><b>${esc(t.name)}</b></td>
+                <td><code style="font-size:.8rem;color:var(--muted)">${esc(t.slug)}</code></td>
+                <td>${n}</td>
+                <td><div class="t-actions">
+                  <button class="t-btn" data-action="edit-tag" data-id="${t.id}">تعديل</button>
+                  <button class="t-btn danger" data-action="delete-tag" data-id="${t.id}">حذف</button>
+                </div></td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="4" class="empty-inline">لا توجد وسوم.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  /* ================= AUTHOR ================= */
+  function viewAuthor() {
+    const a = AAB.DB.get().author;
+    return `
+      <div class="admin-head"><div><h1>بيانات الكاتب</h1><p>تظهر في صفحة "من أنا" وفي بطاقات المقالات</p></div></div>
+      <div class="panel">
+        <div class="form-grid">
+          <div class="field"><label>الاسم</label><input id="a-name" type="text" value="${esc(a.name)}"></div>
+          <div class="field"><label>المسمى الوظيفي</label><input id="a-title" type="text" value="${esc(a.title || '')}"></div>
+        </div>
+        <div class="field"><label>النبذة</label><textarea id="a-bio" style="min-height:100px">${esc(a.bio)}</textarea></div>
+        <div class="field"><label>رابط الصورة</label><input id="a-avatar" type="text" value="${esc(a.avatar)}"></div>
+        <div class="field"><label>المهارات (مفصولة بفاصلة)</label><input id="a-skills" type="text" value="${esc((a.skills || []).join(', '))}"></div>
+        <div class="form-grid">
+          <div class="field"><label>الموقع</label><input id="a-website" type="text" value="${esc(a.links.website || '')}"></div>
+          <div class="field"><label>Twitter</label><input id="a-twitter" type="text" value="${esc(a.links.twitter || '')}"></div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>LinkedIn</label><input id="a-linkedin" type="text" value="${esc(a.links.linkedin || '')}"></div>
+          <div class="field"><label>GitHub</label><input id="a-github" type="text" value="${esc(a.links.github || '')}"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-brand" data-action="save-author">حفظ التعديلات</button>
+        </div>
+        <p class="form-note" id="authorNote"></p>
+      </div>
+    `;
+  }
+
+  /* ================= SETTINGS ================= */
+  function viewSettings() {
+    const s = AAB.DB.get().settings;
+    return `
+      <div class="admin-head"><div><h1>إعدادات الموقع</h1><p>البيانات الأساسية للمدونة</p></div></div>
+      <div class="panel">
+        <div class="form-grid">
+          <div class="field"><label>اسم الموقع</label><input id="s-siteName" type="text" value="${esc(s.siteName)}"></div>
+          <div class="field"><label>الشعار النصي</label><input id="s-tagline" type="text" value="${esc(s.tagline)}"></div>
+        </div>
+        <div class="field"><label>الوصف</label><textarea id="s-description" style="min-height:80px">${esc(s.description)}</textarea></div>
+        <div class="form-grid">
+          <div class="field"><label>رابط المتجر</label><input id="s-storeUrl" type="text" value="${esc(s.storeUrl)}"></div>
+          <div class="field"><label>رابط المدونة</label><input id="s-siteUrl" type="text" value="${esc(s.siteUrl)}"></div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>البريد الإلكتروني</label><input id="s-email" type="email" value="${esc(s.email)}"></div>
+          <div class="field"><label>صورة OG الافتراضية</label><input id="s-defaultOg" type="text" value="${esc(s.defaultOg)}"></div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Twitter</label><input id="s-tw" type="text" value="${esc(s.social.twitter || '')}"></div>
+          <div class="field"><label>LinkedIn</label><input id="s-li" type="text" value="${esc(s.social.linkedin || '')}"></div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>GitHub</label><input id="s-gh" type="text" value="${esc(s.social.github || '')}"></div>
+          <div class="field"><label>YouTube</label><input id="s-yt" type="text" value="${esc(s.social.youtube || '')}"></div>
+        </div>
+        <div class="field" style="flex-direction:row;align-items:center;gap:10px">
+          <input type="checkbox" id="s-newsletter" ${s.newsletterEnabled ? 'checked' : ''} style="width:auto">
+          <label for="s-newsletter" style="font-weight:600">تفعيل قسم النشرة البريدية</label>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-brand" data-action="save-settings">حفظ الإعدادات</button>
+        </div>
+        <p class="form-note" id="settingsNote"></p>
+      </div>
+    `;
+  }
+
+  /* ================= SUBSCRIBERS ================= */
+  function viewSubscribers() {
+    const subs = AAB.DB.get().subscribers || [];
+    return `
+      <div class="admin-head"><div><h1>المشتركون في النشرة</h1><p>${subs.length} مشترك</p></div></div>
+      <div class="panel">
+        <table class="admin-table">
+          <thead><tr><th>البريد الإلكتروني</th><th>تاريخ الاشتراك</th></tr></thead>
+          <tbody>
+            ${subs.map(s => `<tr><td>${esc(s.email)}</td><td>${AAB.formatDate(s.at)}</td></tr>`).join('') || '<tr><td colspan="2" class="empty-inline">لا يوجد مشتركون بعد.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  /* ================= BINDINGS ================= */
+  function bindView(view) {
+    const root = $('#viewRoot');
+
+    /* Global actions */
+    root.addEventListener('click', function (e) {
+      const t = e.target.closest('[data-action]');
+      if (!t) return;
+      const action = t.dataset.action;
+      const id = t.dataset.id;
+
+      if (action === 'new-post') { editingPostId = null; renderView('editor'); }
+      else if (action === 'edit-post') { editingPostId = id; renderView('editor'); }
+      else if (action === 'delete-post') { if (confirm('حذف هذا المقال نهائيًا؟')) deletePost(id); }
+      else if (action === 'goto-posts') { renderView('posts'); }
+      else if (action === 'cancel-edit') { editingPostId = null; renderView('posts'); }
+      else if (action === 'save-post') { savePost(id, false); }
+      else if (action === 'save-draft') { savePost(id, true); }
+      else if (action === 'new-category') { createCategory(); }
+      else if (action === 'edit-category') { editCategory(id); }
+      else if (action === 'delete-category') { if (confirm('حذف هذا التصنيف؟')) deleteCategory(id); }
+      else if (action === 'new-tag') { createTag(); }
+      else if (action === 'edit-tag') { editTag(id); }
+      else if (action === 'delete-tag') { if (confirm('حذف هذا الوسم؟')) deleteTag(id); }
+      else if (action === 'save-author') { saveAuthor(); }
+      else if (action === 'save-settings') { saveSettings(); }
+    }, { once: false });
+
+    if (view === 'editor') bindEditor();
+  }
+
+  /* ---------- Editor bindings ---------- */
+  function bindEditor() {
+    const root = $('#viewRoot');
+    const title = $('#f-title', root);
+    const slug = $('#f-slug', root);
+
+    /* Auto slug from title */
+    title?.addEventListener('input', function () {
+      if (!editingPostId && (!slug.value || slug.dataset.auto !== 'false')) {
+        slug.value = AAB.slugify(title.value);
+      }
+    });
+    slug?.addEventListener('input', function () { slug.dataset.auto = 'false'; });
+
+    /* Toolbar */
+    $$('.editor-toolbar button', root).forEach(btn => {
+      btn.addEventListener('click', function () {
+        const cmd = btn.dataset.cmd;
+        const area = $('#f-content', root);
+        area.focus();
+        if (cmd === 'bold') document.execCommand('bold');
+        else if (cmd === 'italic') document.execCommand('italic');
+        else if (cmd === 'ul') document.execCommand('insertUnorderedList');
+        else if (cmd === 'ol') document.execCommand('insertOrderedList');
+        else if (cmd === 'h2') document.execCommand('formatBlock', false, 'H2');
+        else if (cmd === 'h3') document.execCommand('formatBlock', false, 'H3');
+        else if (cmd === 'quote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+        else if (cmd === 'link') {
+          const url = prompt('رابط URL:');
+          if (url) document.execCommand('createLink', false, url);
+        }
+        else if (cmd === 'img') {
+          const url = prompt('رابط الصورة:');
+          if (url) document.execCommand('insertImage', false, url);
+        }
+        else if (cmd === 'hr') document.execCommand('insertHorizontalRule');
+        else if (cmd === 'code') {
+          const code = prompt('اكتب الكود:');
+          if (code) document.execCommand('insertHTML', false, '<pre><code>' + esc(code) + '</code></pre>');
+        }
+      });
+    });
+
+    /* Tags */
+    const tagInput = $('#tagInput', root);
+    const tagBox = $('#tagBox', root);
+    tagInput?.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = tagInput.value.trim();
+        if (!val) return;
+        let db = AAB.DB.get();
+        let tag = db.tags.find(t => t.name === val);
+        if (!tag) {
+          tag = { id: 't' + Date.now(), name: val, slug: AAB.slugify(val) };
+          db.tags.push(tag);
+          AAB.DB.save(db);
+        }
+        if (!tagBox.querySelector(`[data-tagid="${tag.id}"]`)) {
+          const el = document.createElement('span');
+          el.className = 'tg';
+          el.dataset.tagid = tag.id;
+          el.innerHTML = `${esc(tag.name)}<button type="button" data-rmtag="${tag.id}">×</button>`;
+          tagBox.insertBefore(el, tagInput);
+        }
+        tagInput.value = '';
+      }
+    });
+    tagBox?.addEventListener('click', function (e) {
+      const b = e.target.closest('[data-rmtag]');
+      if (b) b.parentElement.remove();
+    });
+  }
+
+  /* ---------- Save post ---------- */
+  function savePost(id, asDraft) {
+    const root = $('#viewRoot');
+    const title = $('#f-title', root).value.trim();
+    const slugVal = $('#f-slug', root).value.trim() || AAB.slugify(title);
+    const excerpt = $('#f-excerpt', root).value.trim();
+    const content = $('#f-content', root).innerHTML.trim();
+    const cover = $('#f-cover', root).value.trim();
+    const categoryId = $('#f-category', root).value;
+    const status = asDraft ? 'draft' : $('#f-status', root).value;
+    const publishedAt = $('#f-publishedAt', root).value;
+    const featured = $('#f-featured', root).checked;
+
+    const note = $('#editorNote', root);
+    if (!title || !content) {
+      note.textContent = 'العنوان والمحتوى مطلوبان.';
+      note.className = 'form-note is-error';
+      return;
+    }
+
+    const tagIds = $$('#tagBox .tg', root).map(el => el.dataset.tagid);
+    const keywords = $('#f-keywords', root).value.split(',').map(s => s.trim()).filter(Boolean);
+
+    const db = AAB.DB.get();
+    const existingIdx = id ? db.posts.findIndex(p => p.id === id) : -1;
+
+    const postData = {
+      id: id || ('p' + Date.now()),
+      slug: slugVal,
+      title: title,
+      excerpt: excerpt,
+      content: content,
+      cover: cover || 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=1600&q=80',
+      categoryId: categoryId,
+      tagIds: tagIds,
+      authorId: db.author.id,
+      publishedAt: publishedAt ? new Date(publishedAt).toISOString() : new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      status: status,
+      featured: featured,
+      views: existingIdx >= 0 ? (db.posts[existingIdx].views || 0) : 0,
+      readingTime: AAB.readingTime(content),
+      metaTitle: $('#f-metaTitle', root).value.trim(),
+      metaDescription: $('#f-metaDescription', root).value.trim(),
+      focusKeyword: $('#f-focusKeyword', root).value.trim(),
+      keywords: keywords,
+      canonical: $('#f-canonical', root).value.trim(),
+      faq: existingIdx >= 0 ? (db.posts[existingIdx].faq || []) : []
+    };
+
+    if (existingIdx >= 0) db.posts[existingIdx] = postData;
+    else db.posts.unshift(postData);
+
+    AAB.DB.save(db);
+    note.textContent = 'تم الحفظ بنجاح ✓';
+    note.className = 'form-note is-ok';
+
+    setTimeout(() => {
+      editingPostId = null;
+      renderView('posts');
+    }, 700);
+  }
+
+  /* ---------- Delete post ---------- */
+  function deletePost(id) {
+    const db = AAB.DB.get();
+    db.posts = db.posts.filter(p => p.id !== id);
+    AAB.DB.save(db);
+    renderView('posts');
+  }
+
+  /* ---------- Categories ---------- */
+  function createCategory() {
+    const name = prompt('اسم التصنيف:');
+    if (!name) return;
+    const db = AAB.DB.get();
+    db.categories.push({
+      id: 'c' + Date.now(),
+      slug: AAB.slugify(name),
+      name: name,
+      description: '',
+      icon: 'folder',
+      color: '#FF5A00',
+      order: db.categories.length + 1
+    });
+    AAB.DB.save(db);
+    renderView('categories');
+  }
+  function editCategory(id) {
+    const db = AAB.DB.get();
+    const c = db.categories.find(x => x.id === id);
+    if (!c) return;
+    const name = prompt('اسم التصنيف:', c.name);
+    if (!name) return;
+    const desc = prompt('الوصف:', c.description || '') ?? c.description;
+    c.name = name;
+    c.slug = AAB.slugify(name);
+    c.description = desc;
+    AAB.DB.save(db);
+    renderView('categories');
+  }
+  function deleteCategory(id) {
+    const db = AAB.DB.get();
+    if (db.posts.some(p => p.categoryId === id)) {
+      if (!confirm('هذا التصنيف مرتبط بمقالات. هل تريد حذفه على أي حال؟ المقالات ستبقى بدون تصنيف.')) return;
+    }
+    db.categories = db.categories.filter(x => x.id !== id);
+    AAB.DB.save(db);
+    renderView('categories');
+  }
+
+  /* ---------- Tags ---------- */
+  function createTag() {
+    const name = prompt('اسم الوسم:');
+    if (!name) return;
+    const db = AAB.DB.get();
+    db.tags.push({ id: 't' + Date.now(), name, slug: AAB.slugify(name) });
+    AAB.DB.save(db);
+    renderView('tags');
+  }
+  function editTag(id) {
+    const db = AAB.DB.get();
+    const t = db.tags.find(x => x.id === id);
+    if (!t) return;
+    const name = prompt('اسم الوسم:', t.name);
+    if (!name) return;
+    t.name = name;
+    t.slug = AAB.slugify(name);
+    AAB.DB.save(db);
+    renderView('tags');
+  }
+  function deleteTag(id) {
+    const db = AAB.DB.get();
+    db.tags = db.tags.filter(x => x.id !== id);
+    db.posts.forEach(p => { p.tagIds = (p.tagIds || []).filter(t => t !== id); });
+    AAB.DB.save(db);
+    renderView('tags');
+  }
+
+  /* ---------- Author ---------- */
+  function saveAuthor() {
+    const root = $('#viewRoot');
+    const db = AAB.DB.get();
+    db.author = {
+      ...db.author,
+      name: $('#a-name', root).value.trim(),
+      title: $('#a-title', root).value.trim(),
+      bio: $('#a-bio', root).value.trim(),
+      avatar: $('#a-avatar', root).value.trim(),
+      skills: $('#a-skills', root).value.split(',').map(s => s.trim()).filter(Boolean),
+      links: {
+        website: $('#a-website', root).value.trim(),
+        twitter: $('#a-twitter', root).value.trim(),
+        linkedin: $('#a-linkedin', root).value.trim(),
+        github: $('#a-github', root).value.trim()
+      }
+    };
+    AAB.DB.save(db);
+    const note = $('#authorNote', root);
+    note.textContent = 'تم الحفظ ✓';
+    note.className = 'form-note is-ok';
+  }
+
+  /* ---------- Settings ---------- */
+  function saveSettings() {
+    const root = $('#viewRoot');
+    const db = AAB.DB.get();
+    db.settings = {
+      ...db.settings,
+      siteName: $('#s-siteName', root).value.trim(),
+      tagline: $('#s-tagline', root).value.trim(),
+      description: $('#s-description', root).value.trim(),
+      storeUrl: $('#s-storeUrl', root).value.trim(),
+      siteUrl: $('#s-siteUrl', root).value.trim(),
+      email: $('#s-email', root).value.trim(),
+      defaultOg: $('#s-defaultOg', root).value.trim(),
+      newsletterEnabled: $('#s-newsletter', root).checked,
+      social: {
+        twitter: $('#s-tw', root).value.trim(),
+        linkedin: $('#s-li', root).value.trim(),
+        github: $('#s-gh', root).value.trim(),
+        youtube: $('#s-yt', root).value.trim()
+      }
+    };
+    AAB.DB.save(db);
+    const note = $('#settingsNote', root);
+    note.textContent = 'تم حفظ الإعدادات ✓';
+    note.className = 'form-note is-ok';
+  }
+
+  /* ================= INIT ================= */
+  document.addEventListener('DOMContentLoaded', function () {
+    const loginForm = $('#loginForm');
+    loginForm?.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const u = $('#luser').value.trim();
+      const p = $('#lpass').value;
+      if (login(u, p)) showAdmin();
+      else {
+        const note = $('#loginNote');
+        note.textContent = 'بيانات الدخول غير صحيحة.';
+        note.className = 'form-note is-error';
+      }
+    });
+
+    $$('#adminNav button').forEach(b => {
+      b.addEventListener('click', function () { renderView(b.dataset.view); });
+    });
+
+    $('#logoutBtn')?.addEventListener('click', function (e) { e.preventDefault(); logout(); });
+    $('#resetDbBtn')?.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (confirm('سيتم حذف كل البيانات واستعادة البذرة. متابعة؟')) {
+        AAB.DB.reset();
+        location.reload();
+      }
+    });
+
+    if (isLogged()) showAdmin(); else showLogin();
+  });
+
+})();
+</script>
+</body>
+</html>
