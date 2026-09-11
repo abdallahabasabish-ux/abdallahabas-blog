@@ -11,270 +11,312 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .skel{position:relative;overflow:hidden;background:var(--bg-3);border-radius:12px}
+  .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:skel 1.3s infinite}
+  @keyframes skel{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .skel-line{height:18px;margin-bottom:14px}
+  #pageLoader{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+  #pageLoader.is-hidden{opacity:0;pointer-events:none}
+  .loader-ring{width:44px;height:44px;border:3px solid var(--brand-50);border-top-color:var(--brand);border-radius:50%;animation:ring .8s linear infinite}
+  @keyframes ring{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body data-page="article">
+
+<div id="pageLoader"><div class="loader-ring" role="status" aria-label="جارٍ التحميل"></div></div>
 
 <div id="app-header"></div>
 
 <main id="main">
-  <div id="articleRoot"></div>
+  <div id="articleRoot">
+    <section class="page-head">
+      <div class="container">
+        <div class="skel skel-line" style="width:30%"></div>
+        <div class="skel skel-line" style="width:80%;height:34px;margin-top:20px"></div>
+        <div class="skel skel-line" style="width:60%;height:34px"></div>
+        <div class="skel" style="aspect-ratio:16/8;margin-top:32px"></div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <div id="app-footer"></div>
 
 <script src="assets/js/data.js"></script>
 <script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+<script type="module">
+import "./assets/js/firebase-data.js";
+
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await AAB.firebaseReady();
+  } catch (e) {
+    console.warn('[article] Firebase unavailable, using cache.', e);
+  }
+
+  AAB.renderHeader();
+  AAB.renderFooter();
+
+  renderArticlePage();
+
+  document.getElementById('pageLoader')?.classList.add('is-hidden');
+});
+
+function renderArticlePage() {
   const slug = new URLSearchParams(location.search).get('slug');
   const root = document.getElementById('articleRoot');
 
-  if (!slug) { renderMissing(); return; }
+  if (!slug) { renderMissing(root); return; }
   const post = AAB.bySlug(slug);
-  if (!post || post.status !== 'published') { renderMissing(); return; }
+  if (!post || post.status !== 'published') { renderMissing(root); return; }
 
-  renderArticle(post);
+  renderArticle(root, post);
+}
 
-  function renderMissing() {
-    root.innerHTML = `
-      <section class="page-head"><div class="container">
-        <nav class="breadcrumb"><a href="index.html">الرئيسية</a>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
-          <span>غير موجود</span></nav>
-        <h1>المقال غير موجود</h1>
-        <p>الرابط الذي فتحته غير صحيح أو تم حذف المقال.</p>
-        <div class="mt-32"><a href="articles.html" class="btn btn-brand">تصفّح جميع المقالات</a></div>
-      </div></section>`;
-    AAB.setSEO({ title: 'المقال غير موجود — ' + AAB.DB.get().settings.siteName });
-  }
+function renderMissing(root) {
+  const db = AAB.DB.get();
+  root.innerHTML = `
+    <section class="page-head"><div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">الرئيسية</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        <span>غير موجود</span>
+      </nav>
+      <h1>المقال غير موجود</h1>
+      <p>الرابط الذي فتحته غير صحيح أو تم حذف المقال.</p>
+      <div class="mt-32"><a href="articles.html" class="btn btn-brand">تصفّح جميع المقالات</a></div>
+    </div></section>`;
+  AAB.setSEO({ title: 'المقال غير موجود — ' + db.settings.siteName });
+}
 
-  function renderArticle(p) {
-    const db = AAB.DB.get();
-    const cat = AAB.getCategory(p.categoryId) || {};
-    const author = db.author;
-    const url = AAB.SITE + '/article.html?slug=' + encodeURIComponent(p.slug);
+function renderArticle(root, p) {
+  const db = AAB.DB.get();
+  const cat = AAB.getCategory(p.categoryId) || {};
+  const author = db.author;
+  const url = AAB.SITE + '/article.html?slug=' + encodeURIComponent(p.slug);
 
-    /* Build TOC from H2/H3 in content */
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = p.content || '';
-    const headings = wrapper.querySelectorAll('h2, h3');
-    let tocHtml = '';
-    if (headings.length) {
-      let n = 0;
-      const items = Array.from(headings).map(h => {
-        n++;
-        if (!h.id) h.id = 'sec-' + n;
-        const lvl = h.tagName === 'H3' ? 'lvl-3' : 'lvl-2';
-        return `<li class="${lvl}"><a href="#${h.id}">${AAB.esc(h.textContent)}</a></li>`;
-      });
-      tocHtml = `<nav class="toc" aria-label="فهرس المقال">
-        <h3>${AAB.icon.tag} محتويات المقال</h3>
-        <ol>${items.join('')}</ol>
-      </nav>`;
-    }
-    const contentHtml = wrapper.innerHTML;
-
-    /* Related */
-    const related = AAB.relatedPosts(p, 3);
-    const relatedHtml = related.length ? `
-      <section class="section" style="padding-top:0">
-        <div class="container">
-          <div class="section-head">
-            <div><h2 class="section-title">مقالات ذات صلة</h2>
-            <p class="section-sub">محتوى قد يهمك بعد هذا المقال</p></div>
-          </div>
-          <div class="grid grid-3">${related.map(r => AAB.postCard(r)).join('')}</div>
-        </div>
-      </section>` : '';
-
-    /* FAQ */
-    const faqHtml = (p.faq && p.faq.length) ? `
-      <div class="faq-list">
-        ${p.faq.map((f, i) => `
-          <details class="faq-item" ${i === 0 ? 'open' : ''}>
-            <summary>${AAB.esc(f.q)}</summary>
-            <div class="faq-body">${AAB.esc(f.a)}</div>
-          </details>`).join('')}
-      </div>` : '';
-
-    /* Author block */
-    const authorAvatar = `<img src="${AAB.esc(author.avatar)}" alt="${AAB.esc(author.name)}" width="32" height="32" loading="lazy"
-      onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(author.name)}',32))">`;
-
-    root.innerHTML = `
-      <article class="article-head-wrap">
-        <header class="article-head">
-          <div class="container">
-            <nav class="breadcrumb" aria-label="مسار">
-              <a href="index.html">الرئيسية</a>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
-              <a href="category.html?slug=${encodeURIComponent(cat.slug || '')}">${AAB.esc(cat.name || 'مقالات')}</a>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
-              <span>${AAB.esc(p.title)}</span>
-            </nav>
-
-            <a class="article-cat" href="category.html?slug=${encodeURIComponent(cat.slug || '')}">${AAB.esc(cat.name || '')}</a>
-            <h1 class="article-title">${AAB.esc(p.title)}</h1>
-            <p class="article-excerpt">${AAB.esc(p.excerpt)}</p>
-
-            <div class="article-info">
-              <span class="author-mini">${authorAvatar} <span>${AAB.esc(author.name)}</span></span>
-              <span class="sep"></span>
-              <span>${AAB.icon.calendar} ${AAB.formatDate(p.publishedAt)}</span>
-              <span class="sep"></span>
-              <span>${AAB.icon.clock} ${p.readingTime || AAB.readingTime(p.content)} دقائق قراءة</span>
-              ${p.updatedAt && p.updatedAt !== p.publishedAt ? `<span class="sep"></span><span>آخر تحديث: ${AAB.formatDate(p.updatedAt)}</span>` : ''}
-            </div>
-
-            <div class="article-hero">
-              <img src="${AAB.esc(p.cover)}" alt="${AAB.esc(p.title)}" width="1200" height="600" fetchpriority="high" decoding="async">
-            </div>
-          </div>
-        </header>
-
-        <div class="container article-layout">
-          <div>
-            ${tocHtml}
-            <div class="prose">${contentHtml}</div>
-
-            ${faqHtml ? `<section style="margin-top:44px">
-              <h2 style="margin-bottom:6px">الأسئلة الشائعة</h2>
-              <p style="color:var(--muted);margin-bottom:8px">أكثر ما يُسأل عن هذا الموضوع.</p>
-              ${faqHtml}
-            </section>` : ''}
-
-            <footer class="article-foot">
-              <div class="share-row">
-                <span>شارك المقال:</span>
-                <a class="share-btn" target="_blank" rel="noopener" aria-label="مشاركة على تويتر"
-                   href="https://twitter.com/intent/tweet?text=${encodeURIComponent(p.title)}&url=${encodeURIComponent(url)}">${AAB.icon.twitter}</a>
-                <a class="share-btn" target="_blank" rel="noopener" aria-label="مشاركة على LinkedIn"
-                   href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}">${AAB.icon.linkedin}</a>
-                <button class="share-btn" type="button" data-copy="${AAB.esc(url)}" aria-label="نسخ الرابط">${AAB.icon.share}</button>
-              </div>
-
-              <div class="author-card">
-                <img src="${AAB.esc(author.avatar)}" alt="${AAB.esc(author.name)}" width="64" height="64" loading="lazy"
-                  onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(author.name)}',64))">
-                <div>
-                  <h4>${AAB.esc(author.name)}</h4>
-                  <p>${AAB.esc(author.bio)}</p>
-                </div>
-              </div>
-
-              <div class="cta-band" style="padding:26px 30px">
-                <div class="cta-band-body">
-                  <h2 style="font-size:1.25rem">تحتاج إلى تطبيق عملي لهذا في مشروعك؟</h2>
-                  <p>اطّلع على خدمات Abdallah Abas في التطوير، الأداء، وتحسين محركات البحث.</p>
-                </div>
-                <a href="${AAB.esc(db.settings.storeUrl)}" target="_blank" rel="noopener" class="btn btn-dark">
-                  استعرض الخدمات
-                </a>
-              </div>
-
-              <div>
-                <a href="articles.html" class="link-more">${AAB.icon.arrow} العودة إلى جميع المقالات</a>
-              </div>
-            </footer>
-          </div>
-
-          <aside class="sidebar" aria-label="الشريط الجانبي">
-            <div class="widget widget-cta">
-              <h3>هل تحتاج مساعدة؟</h3>
-              <p>خدمات احترافية في التطوير وتحسين محركات البحث.</p>
-              <a href="${AAB.esc(db.settings.storeUrl)}" target="_blank" rel="noopener" class="btn btn-brand btn-block">تواصل الآن</a>
-            </div>
-            <div class="widget">
-              <h3 class="widget-title">${AAB.icon.tag} وسوم المقال</h3>
-              <div class="chip-row" style="margin:0">
-                ${(p.tagIds || []).map(id => {
-                  const t = AAB.getTag(id);
-                  return t ? `<li class="chip">${AAB.esc(t.name)}</li>` : '';
-                }).join('') || '<span class="empty-inline">لا توجد وسوم.</span>'}
-              </div>
-            </div>
-          </aside>
-        </div>
-      </article>
-
-      ${relatedHtml}
-    `;
-
-    /* Copy link */
-    root.querySelectorAll('[data-copy]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(btn.dataset.copy);
-          const old = btn.innerHTML;
-          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>';
-          setTimeout(() => btn.innerHTML = old, 1400);
-        } catch (e) { /* ignore */ }
-      });
+  /* --- بناء فهرس المحتوى (TOC) --- */
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = p.content || '';
+  const headings = wrapper.querySelectorAll('h2, h3');
+  let tocHtml = '';
+  if (headings.length) {
+    let n = 0;
+    const items = Array.from(headings).map(h => {
+      n++;
+      if (!h.id) h.id = 'sec-' + n;
+      const lvl = h.tagName === 'H3' ? 'lvl-3' : 'lvl-2';
+      return `<li class="${lvl}"><a href="#${h.id}">${AAB.esc(h.textContent)}</a></li>`;
     });
+    tocHtml = `<nav class="toc" aria-label="فهرس المقال">
+      <h3>${AAB.icon.tag} محتويات المقال</h3>
+      <ol>${items.join('')}</ol>
+    </nav>`;
+  }
+  const contentHtml = wrapper.innerHTML;
 
-    /* SEO + Schema */
-    const schema = {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "headline": p.title,
-      "description": p.metaDescription || p.excerpt,
-      "image": p.cover,
-      "datePublished": p.publishedAt,
-      "dateModified": p.updatedAt || p.publishedAt,
-      "inLanguage": "ar",
-      "mainEntityOfPage": { "@type": "WebPage", "@id": url },
-      "author": { "@type": "Person", "name": author.name, "url": AAB.STORE },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Abdallah Abas",
-        "url": AAB.STORE,
-        "logo": { "@type": "ImageObject", "url": AAB.SITE + '/assets/img/logo.svg' }
-      },
-      "keywords": (p.keywords || []).join(', ')
-    };
-    const schemas = [schema];
+  /* --- مقالات ذات صلة --- */
+  const related = AAB.relatedPosts(p, 3);
+  const relatedHtml = related.length ? `
+    <section class="section" style="padding-top:0">
+      <div class="container">
+        <div class="section-head">
+          <div><h2 class="section-title">مقالات ذات صلة</h2>
+          <p class="section-sub">محتوى قد يهمك بعد هذا المقال</p></div>
+        </div>
+        <div class="grid grid-3">${related.map(r => AAB.postCard(r)).join('')}</div>
+      </div>
+    </section>` : '';
 
-    /* BreadcrumbList */
+  /* --- FAQ --- */
+  const faqHtml = (p.faq && p.faq.length) ? `
+    <div class="faq-list">
+      ${p.faq.map((f, i) => `
+        <details class="faq-item" ${i === 0 ? 'open' : ''}>
+          <summary>${AAB.esc(f.q)}</summary>
+          <div class="faq-body">${AAB.esc(f.a)}</div>
+        </details>`).join('')}
+    </div>` : '';
+
+  const authorAvatar = `<img src="${AAB.esc(author.avatar)}" alt="${AAB.esc(author.name)}" width="32" height="32" loading="lazy"
+    onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(author.name)}',32))">`;
+
+  root.innerHTML = `
+    <article class="article-head-wrap">
+      <header class="article-head">
+        <div class="container">
+          <nav class="breadcrumb" aria-label="مسار">
+            <a href="index.html">الرئيسية</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+            <a href="category.html?slug=${encodeURIComponent(cat.slug || '')}">${AAB.esc(cat.name || 'مقالات')}</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+            <span>${AAB.esc(p.title)}</span>
+          </nav>
+
+          <a class="article-cat" href="category.html?slug=${encodeURIComponent(cat.slug || '')}">${AAB.esc(cat.name || '')}</a>
+          <h1 class="article-title">${AAB.esc(p.title)}</h1>
+          <p class="article-excerpt">${AAB.esc(p.excerpt)}</p>
+
+          <div class="article-info">
+            <span class="author-mini">${authorAvatar} <span>${AAB.esc(author.name)}</span></span>
+            <span class="sep"></span>
+            <span>${AAB.icon.calendar} ${AAB.formatDate(p.publishedAt)}</span>
+            <span class="sep"></span>
+            <span>${AAB.icon.clock} ${p.readingTime || AAB.readingTime(p.content)} دقائق قراءة</span>
+            ${p.updatedAt && p.updatedAt !== p.publishedAt ? `<span class="sep"></span><span>آخر تحديث: ${AAB.formatDate(p.updatedAt)}</span>` : ''}
+          </div>
+
+          ${p.cover ? `<div class="article-hero">
+            <img src="${AAB.esc(p.cover)}" alt="${AAB.esc(p.title)}" width="1200" height="600" fetchpriority="high" decoding="async">
+          </div>` : ''}
+        </div>
+      </header>
+
+      <div class="container article-layout">
+        <div>
+          ${tocHtml}
+          <div class="prose">${contentHtml}</div>
+
+          ${faqHtml ? `<section style="margin-top:44px">
+            <h2 style="margin-bottom:6px">الأسئلة الشائعة</h2>
+            <p style="color:var(--muted);margin-bottom:8px">أكثر ما يُسأل عن هذا الموضوع.</p>
+            ${faqHtml}
+          </section>` : ''}
+
+          <footer class="article-foot">
+            <div class="share-row">
+              <span>شارك المقال:</span>
+              <a class="share-btn" target="_blank" rel="noopener" aria-label="مشاركة على تويتر"
+                 href="https://twitter.com/intent/tweet?text=${encodeURIComponent(p.title)}&url=${encodeURIComponent(url)}">${AAB.icon.twitter}</a>
+              <a class="share-btn" target="_blank" rel="noopener" aria-label="مشاركة على LinkedIn"
+                 href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}">${AAB.icon.linkedin}</a>
+              <button class="share-btn" type="button" data-copy="${AAB.esc(url)}" aria-label="نسخ الرابط">${AAB.icon.share}</button>
+            </div>
+
+            <div class="author-card">
+              <img src="${AAB.esc(author.avatar)}" alt="${AAB.esc(author.name)}" width="64" height="64" loading="lazy"
+                onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(author.name)}',64))">
+              <div>
+                <h4>${AAB.esc(author.name)}</h4>
+                <p>${AAB.esc(author.bio)}</p>
+              </div>
+            </div>
+
+            <div class="cta-band" style="padding:26px 30px">
+              <div class="cta-band-body">
+                <h2 style="font-size:1.25rem">تحتاج إلى تطبيق عملي لهذا في مشروعك؟</h2>
+                <p>اطّلع على خدمات Abdallah Abas في التطوير، الأداء، وتحسين محركات البحث.</p>
+              </div>
+              <a href="${AAB.esc(db.settings.storeUrl)}" target="_blank" rel="noopener" class="btn btn-dark">
+                استعرض الخدمات
+              </a>
+            </div>
+
+            <div>
+              <a href="articles.html" class="link-more">${AAB.icon.arrow} العودة إلى جميع المقالات</a>
+            </div>
+          </footer>
+        </div>
+
+        <aside class="sidebar" aria-label="الشريط الجانبي">
+          <div class="widget widget-cta">
+            <h3>هل تحتاج مساعدة؟</h3>
+            <p>خدمات احترافية في التطوير وتحسين محركات البحث.</p>
+            <a href="${AAB.esc(db.settings.storeUrl)}" target="_blank" rel="noopener" class="btn btn-brand btn-block">تواصل الآن</a>
+          </div>
+          <div class="widget">
+            <h3 class="widget-title">${AAB.icon.tag} وسوم المقال</h3>
+            <ul class="chip-row" style="margin:0">
+              ${(p.tagIds || []).map(id => {
+                const t = AAB.getTag(id);
+                return t ? `<li class="chip">${AAB.esc(t.name)}</li>` : '';
+              }).join('') || '<li class="empty-inline">لا توجد وسوم.</li>'}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </article>
+
+    ${relatedHtml}
+  `;
+
+  /* --- زر نسخ الرابط --- */
+  root.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        const old = btn.innerHTML;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>';
+        setTimeout(() => btn.innerHTML = old, 1400);
+      } catch (e) { /* ignore */ }
+    });
+  });
+
+  /* --- زيادة عدد المشاهدات (Firestore) --- */
+  try {
+    const fresh = AAB.DB.get();
+    const target = fresh.posts.find(x => x.id === p.id);
+    if (target) {
+      target.views = (target.views || 0) + 1;
+      // تحديث في Firestore بدون انتظار (fire and forget)
+      AAB.DB.savePost({ ...target, views: target.views }).catch(() => {});
+    }
+  } catch (e) { /* ignore */ }
+
+  /* --- Schema.org + SEO --- */
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": p.title,
+    "description": p.metaDescription || p.excerpt,
+    "image": p.cover,
+    "datePublished": p.publishedAt,
+    "dateModified": p.updatedAt || p.publishedAt,
+    "inLanguage": "ar",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": url },
+    "author": { "@type": "Person", "name": author.name, "url": AAB.STORE },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Abdallah Abas",
+      "url": AAB.STORE,
+      "logo": { "@type": "ImageObject", "url": AAB.SITE + '/assets/img/logo.svg' }
+    },
+    "keywords": (p.keywords || []).join(', ')
+  };
+  const schemas = [schema];
+
+  schemas.push({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": AAB.SITE + '/' },
+      { "@type": "ListItem", "position": 2, "name": cat.name || 'مقالات', "item": AAB.SITE + '/category.html?slug=' + encodeURIComponent(cat.slug || '') },
+      { "@type": "ListItem", "position": 3, "name": p.title, "item": url }
+    ]
+  });
+
+  if (p.faq && p.faq.length) {
     schemas.push({
       "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": AAB.SITE + '/' },
-        { "@type": "ListItem", "position": 2, "name": cat.name || 'مقالات', "item": AAB.SITE + '/category.html?slug=' + encodeURIComponent(cat.slug || '') },
-        { "@type": "ListItem", "position": 3, "name": p.title, "item": url }
-      ]
+      "@type": "FAQPage",
+      "mainEntity": p.faq.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
     });
-
-    /* FAQPage */
-    if (p.faq && p.faq.length) {
-      schemas.push({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": p.faq.map(f => ({
-          "@type": "Question",
-          "name": f.q,
-          "acceptedAnswer": { "@type": "Answer", "text": f.a }
-        }))
-      });
-    }
-
-    AAB.setSEO({
-      title: (p.metaTitle || p.title) + ' — ' + db.settings.siteName,
-      description: p.metaDescription || p.excerpt,
-      canonical: p.canonical || url,
-      image: p.cover,
-      type: 'article',
-      schema: schemas
-    });
-
-    /* Increment views */
-    try {
-      const fresh = AAB.DB.get();
-      const target = fresh.posts.find(x => x.id === p.id);
-      if (target) { target.views = (target.views || 0) + 1; AAB.DB.save(fresh); }
-    } catch (e) { /* ignore */ }
   }
-});
+
+  AAB.setSEO({
+    title: (p.metaTitle || p.title) + ' — ' + db.settings.siteName,
+    description: p.metaDescription || p.excerpt,
+    canonical: p.canonical || url,
+    image: p.cover,
+    type: 'article',
+    schema: schemas
+  });
+}
 </script>
 </body>
 </html>
