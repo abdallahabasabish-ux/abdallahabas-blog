@@ -1,0 +1,12 @@
+{
+  "name": "عبد الله عباس",
+  "avatar": "/uploads/author.jpg",
+  "bio": "مطوّر ومستشار رقمي، أساعد الأفراد والشركات على بناء حضور رقمي احترافي وتطوير أعمالهم عبر الويب.",
+  "expertise": ["تطوير الويب", "تحسين محركات البحث", "التسويق الرقمي"],
+  "website": "https://abdallahabas.com",
+  "social": {
+    "twitter": "https://twitter.com/abdallahabas",
+    "linkedin": "https://linkedin.com/in/abdallahabas",
+    "github": "https://github.com/abdallahabas"
+  }
+}
