@@ -1,0 +1,139 @@
+# =========================================================
+#  Abdallah Abas Blog — Apache Configuration
+#  blog.abdallahabas.com
+# =========================================================
+
+# ---------- 1. Force HTTPS ----------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+  # إزالة www
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+  # إزالة الشرطة المائلة الأخيرة
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} (.+)/$
+  RewriteRule ^ %1 [R=301,L]
+</IfModule>
+
+# ---------- 2. Custom Error Page ----------
+ErrorDocument 404 /404.html
+
+# ---------- 3. Compression ----------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml
+  AddOutputFilterByType DEFLATE text/css text/javascript application/javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/javascript
+  AddOutputFilterByType BROTLI_COMPRESS application/javascript application/json
+  AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+# ---------- 4. Browser Caching ----------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+
+  # HTML — قصير (للتحديثات)
+  ExpiresByType text/html "access plus 1 hour"
+
+  # CSS/JS — طويل مع نسخ (cache busting)
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+
+  # الصور
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/avif "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+
+  # الخطوط
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+
+  # ملفات ثابتة
+  ExpiresByType application/xml "access plus 1 day"
+  ExpiresByType application/json "access plus 1 day"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Cache-Control صريح
+  <FilesMatch "\.(css|js|woff2?|jpg|jpeg|png|webp|avif|svg|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|xml|json)$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+
+  # ---------- 5. Security Headers ----------
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # CSP — عدّلها حسب احتياجك
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+
+  # إزالة بصمة الخادم
+  Header unset Server
+  Header unset X-Powered-By
+</IfModule>
+
+# ---------- 6. MIME Types ----------
+<IfModule mod_mime.c>
+  AddType image/avif .avif
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+  AddType application/manifest+json .webmanifest
+</IfModule>
+
+# ---------- 7. حماية الملفات الحساسة ----------
+<FilesMatch "^\.(env|git|htaccess|htpasswd|DS_Store)">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(json|md|log|sql|bak|config)$">
+  Require all denied
+</FilesMatch>
+
+# اسمح بملفات معينة مطلوبة علنًا
+<Files "sitemap.xml">
+  Require all granted
+</Files>
+<Files "robots.txt">
+  Require all granted
+</Files>
+<Files "manifest.webmanifest">
+  Require all granted
+</Files>
+
+# ---------- 8. منع عرض قائمة المجلدات ----------
+Options -Indexes
+
+# ---------- 9. منع hotlinking للصور ----------
+<IfModule mod_rewrite.c>
+  RewriteCond %{HTTP_REFERER} !^$
+  RewriteCond %{HTTP_REFERER} !^https?://(www\.)?blog\.abdallahabas\.com [NC]
+  RewriteCond %{HTTP_REFERER} !^https?://(www\.)?abdallahabas\.com [NC]
+  RewriteCond %{HTTP_REFERER} !^https?://(www\.)?google\. [NC]
+  RewriteCond %{HTTP_REFERER} !^https?://(www\.)?bing\. [NC]
+  RewriteRule \.(jpg|jpeg|png|gif|webp|avif|svg)$ - [F,NC,L]
+</IfModule>
+
+# ---------- 10. Redirects لروابط قديمة ----------
+<IfModule mod_rewrite.c>
+  # أمثلة — عدّلها حسب الحاجة
+  RewriteRule ^blog/(.*)$ /articles.html [R=301,L]
+  RewriteRule ^post/(.*)$ /article.html?slug=$1 [R=301,L]
+</IfModule>
