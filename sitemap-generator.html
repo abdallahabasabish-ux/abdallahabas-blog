@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>مولّد خريطة الموقع — Abdallah Abas</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  body{padding:40px;background:var(--bg-2)}
+  .gen-box{max-width:900px;margin:0 auto;background:#fff;padding:32px;border-radius:var(--r-lg);border:1px solid var(--line)}
+  .gen-box h1{margin-bottom:10px}
+  .gen-box p{color:var(--muted);margin-bottom:22px}
+  textarea{width:100%;min-height:400px;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;padding:16px;border:1.5px solid var(--line);border-radius:var(--r);background:var(--bg-2);line-height:1.6}
+  .row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .badge-gen{display:inline-block;padding:3px 10px;background:var(--brand-50);color:var(--brand-700);border-radius:var(--r-full);font-size:.78rem;font-weight:700;margin-inline-start:8px}
+</style>
+</head>
+<body>
+<div class="gen-box">
+  <h1>🗺️ مولّد sitemap.xml</h1>
+  <p>يولّد خريطة موقع محدّثة من بيانات المدونة. انسخ الناتج إلى ملف <code>sitemap.xml</code> في جذر المشروع.</p>
+  <div id="preview"></div>
+  <div class="row">
+    <button class="btn btn-brand" id="genBtn">توليد sitemap.xml</button>
+    <button class="btn btn-outline" id="copyBtn">نسخ إلى الحافظة</button>
+    <a class="btn btn-ghost" href="index.html">← العودة للمدونة</a>
+  </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function buildSitemap() {
+    const db = AAB.DB.get();
+    const posts = AAB.published();
+    const now = new Date().toISOString().split('T')[0];
+    const lines = [];
+    lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+    lines.push('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
+
+    function url(loc, lastmod, changefreq, priority) {
+      lines.push('  <url>');
+      lines.push('    <loc>' + loc + '</loc>');
+      if (lastmod) lines.push('    <lastmod>' + lastmod + '</lastmod>');
+      if (changefreq) lines.push('    <changefreq>' + changefreq + '</changefreq>');
+      if (priority) lines.push('    <priority>' + priority + '</priority>');
+      lines.push('  </url>');
+    }
+
+    url(AAB.SITE + '/', now, 'daily', '1.0');
+    url(AAB.SITE + '/articles.html', now, 'daily', '0.9');
+    url(AAB.SITE + '/categories.html', now, 'weekly', '0.8');
+    url(AAB.SITE + '/about.html', '', 'monthly', '0.7');
+    url(AAB.SITE + '/contact.html', '', 'monthly', '0.6');
+    url(AAB.SITE + '/faq.html', '', 'monthly', '0.6');
+
+    db.categories.forEach(c => {
+      url(AAB.SITE + '/category.html?slug=' + encodeURIComponent(c.slug), '', 'weekly', '0.7');
+    });
+
+    posts.forEach(p => {
+      const lm = (p.updatedAt || p.publishedAt || '').split('T')[0];
+      url(AAB.SITE + '/article.html?slug=' + encodeURIComponent(p.slug), lm, 'monthly', '0.8');
+    });
+
+    ['privacy', 'terms', 'cookies', 'disclaimer'].forEach(slug => {
+      url(AAB.SITE + '/' + slug + '.html', '', 'yearly', '0.3');
+    });
+
+    lines.push('</urlset>');
+    return lines.join('\n');
+  }
+
+  function render() {
+    const xml = buildSitemap();
+    const postCount = AAB.published().length;
+    const catCount = AAB.DB.get().categories.length;
+    document.getElementById('preview').innerHTML = `
+      <div style="margin-bottom:14px;font-size:.9rem;color:var(--muted)">
+        إجمالي الروابط: <b>${postCount + catCount + 10}</b>
+        <span class="badge-gen">${postCount} مقال</span>
+        <span class="badge-gen">${catCount} تصنيف</span>
+      </div>
+      <textarea id="xmlOut" readonly>${xml.replace(/</g, '&lt;')}</textarea>`;
+  }
+
+  document.getElementById('genBtn').addEventListener('click', render);
+  document.getElementById('copyBtn').addEventListener('click', async function () {
+    const xml = buildSitemap();
+    try {
+      await navigator.clipboard.writeText(xml);
+      this.textContent = '✓ تم النسخ';
+      setTimeout(() => this.textContent = 'نسخ إلى الحافظة', 1500);
+    } catch (e) {
+      alert('تعذّر النسخ التلقائي. انسخ يدويًا من الصندوق.');
+    }
+  });
+
+  render();
+});
+</script>
+</body>
+</html>
