@@ -1,0 +1,31 @@
+---
+type Props = { currentPage: number; totalPages: number; basePath: string };
+const { currentPage, totalPages, basePath } = Astro.props;
+const build = (n: number) => (n === 1 ? basePath : `${basePath}/page/${n}`);
+---
+{totalPages > 1 && (
+  <nav class="mt-12 flex items-center justify-center gap-2" aria-label="ترقيم الصفحات">
+    {currentPage > 1 && (
+      <a href={build(currentPage - 1)}
+        class="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-500 hover:text-brand-600">
+        السابق
+      </a>
+    )}
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+      <a href={build(n)} aria-current={n === currentPage ? "page" : undefined}
+        class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+          n === currentPage
+            ? "bg-brand-500 text-white"
+            : "border border-ink-200 text-ink-700 hover:border-brand-500 hover:text-brand-600"
+        }`}>
+        {n}
+      </a>
+    ))}
+    {currentPage < totalPages && (
+      <a href={build(currentPage + 1)}
+        class="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-500 hover:text-brand-600">
+        التالي
+      </a>
+    )}
+  </nav>
+)}
