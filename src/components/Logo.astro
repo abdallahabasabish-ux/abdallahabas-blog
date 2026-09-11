@@ -1,0 +1,28 @@
+---
+import { SITE } from "@/lib/config";
+type Props = { class?: string };
+const { class: className = "" } = Astro.props;
+
+// Fallback نصي آمن إن لم يكن الشعار موجودًا بعد
+const logoExists = true; // غيّرها إلى false إن لم ترفع الشعار بعد
+---
+<a href="/" class={`inline-flex items-center gap-2 ${className}`} aria-label={SITE.blogName}>
+  {logoExists ? (
+    <img
+      src={SITE.logo}
+      alt={SITE.name}
+      width="150"
+      height="38"
+      class="h-8 w-auto md:h-9"
+      loading="eager"
+      decoding="async"
+    />
+  ) : (
+    <span class="flex items-center gap-2">
+      <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-white font-bold text-lg leading-none">
+        ع
+      </span>
+      <span class="font-bold text-lg text-ink-900 hidden sm:inline">{SITE.name}</span>
+    </span>
+  )}
+</a>
