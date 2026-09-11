@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>من أنا — مدونة Abdallah Abas</title>
+<meta name="description" content="تعرّف على Abdallah Abas: مطوّر Full-Stack، مهندس SEO، ومصمم واجهات. خبرات ومشاريع وروابط التواصل.">
+<link rel="canonical" href="https://blog.abdallahabas.com/about.html">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="about">
+
+<div id="app-header"></div>
+
+<main id="main">
+  <section class="page-head">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">الرئيسية</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        <span>من أنا</span>
+      </nav>
+      <h1>من أنا</h1>
+      <p>نبذة عن Abdallah Abas، الخبرات، والمشاريع.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="author-box" id="authorBox" style="grid-template-columns:260px 1fr"></div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">مقالاتي</h2>
+          <p class="section-sub">كل ما نشرته في هذه المدونة</p>
+        </div>
+      </div>
+      <div class="grid grid-3" id="authorPosts"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="cta-band">
+        <div class="cta-band-body">
+          <h2>هل لديك مشروع تريد تطويره؟</h2>
+          <p>أعمل مع أفراد وشركات على تطوير الويب، تحسين محركات البحث، وتحسين تجربة المستخدم.</p>
+        </div>
+        <a href="contact.html" class="btn btn-dark btn-lg">تواصل معي</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="app-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const db = AAB.DB.get();
+  const a = db.author;
+  const pub = AAB.published();
+
+  document.getElementById('authorBox').innerHTML = `
+    <div class="author-box-media">
+      <div class="author-avatar">
+        <img src="${AAB.esc(a.avatar)}" alt="${AAB.esc(a.name)}" width="180" height="180"
+             onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(a.name)}','180'))">
+      </div>
+    </div>
+    <div class="author-box-body">
+      <span class="eyebrow">${AAB.esc(a.title)}</span>
+      <h2>${AAB.esc(a.name)}</h2>
+      <p>${AAB.esc(a.bio)}</p>
+      <ul class="chip-row">${(a.skills || []).map(s => `<li class="chip">${AAB.esc(s)}</li>`).join('')}</ul>
+      <div class="hero-actions">
+        <a href="${AAB.esc(a.links.website)}" target="_blank" rel="noopener" class="btn btn-brand">الموقع الرئيسي</a>
+        ${a.links.twitter ? `<a href="${AAB.esc(a.links.twitter)}" target="_blank" rel="noopener" class="btn btn-outline">Twitter</a>` : ''}
+        ${a.links.linkedin ? `<a href="${AAB.esc(a.links.linkedin)}" target="_blank" rel="noopener" class="btn btn-outline">LinkedIn</a>` : ''}
+        ${a.links.github ? `<a href="${AAB.esc(a.links.github)}" target="_blank" rel="noopener" class="btn btn-outline">GitHub</a>` : ''}
+      </div>
+    </div>
+  `;
+
+  const byMe = pub.filter(p => p.authorId === a.id);
+  document.getElementById('authorPosts').innerHTML = byMe.length
+    ? byMe.map(p => AAB.postCard(p)).join('')
+    : '<p class="empty-inline">لا توجد مقالات منشورة بعد.</p>';
+
+  AAB.setSEO({
+    title: 'من أنا — ' + db.settings.siteName,
+    description: a.bio,
+    canonical: AAB.SITE + '/about.html',
+    type: 'profile',
+    schema: {
+      "@context":"https://schema.org",
+      "@type":"Person",
+      "name": a.name,
+      "jobTitle": a.title,
+      "description": a.bio,
+      "url": AAB.SITE + '/about.html',
+      "image": a.avatar,
+      "sameAs": Object.values(a.links || {}).filter(Boolean)
+    }
+  });
+});
+</script>
+</body>
+</html>
