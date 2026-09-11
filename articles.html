@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>جميع المقالات — مدونة Abdallah Abas</title>
+<meta name="description" content="استعرض جميع مقالات مدونة Abdallah Abas في تطوير الويب، SEO، التصميم، وريادة الأعمال.">
+<link rel="canonical" href="https://blog.abdallahabas.com/articles.html">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="articles">
+
+<div id="app-header"></div>
+
+<main id="main">
+  <section class="page-head">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="مسار">
+        <a href="index.html">الرئيسية</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        <span>المقالات</span>
+      </nav>
+      <h1>جميع المقالات</h1>
+      <p>كل ما نشرته في المدونة — مرتب من الأحدث إلى الأقدم.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="search-summary">
+        <div><strong id="countNum">0</strong> <span id="countLabel">مقال</span></div>
+        <div class="result-count" id="sortInfo">مرتبة حسب: الأحدث</div>
+      </div>
+
+      <div class="grid grid-2" id="articlesGrid" style="gap:28px"></div>
+      <div id="pagination" class="pagination" role="navigation" aria-label="ترقيم الصفحات"></div>
+    </div>
+  </section>
+</main>
+
+<div id="app-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const PER_PAGE = 6;
+  const params = new URLSearchParams(location.search);
+  let page = Math.max(1, parseInt(params.get('page') || '1', 10));
+
+  const all = AAB.published();
+  const total = all.length;
+  const pages = Math.max(1, Math.ceil(total / PER_PAGE));
+  if (page > pages) page = pages;
+  const start = (page - 1) * PER_PAGE;
+  const slice = all.slice(start, start + PER_PAGE);
+
+  document.getElementById('countNum').textContent = total;
+
+  const grid = document.getElementById('articlesGrid');
+  if (!slice.length) {
+    grid.outerHTML = `
+      <div class="empty-state">
+        <div class="emoji">${AAB.icon.folder}</div>
+        <h2>لا توجد مقالات بعد</h2>
+        <p>سيتم نشر أول مقال قريبًا. عُد لاحقًا.</p>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = slice.map(p => AAB.postCard(p)).join('');
+
+  /* Pagination */
+  if (pages > 1) {
+    const el = document.getElementById('pagination');
+    const items = [];
+    const qs = (n) => n === 1 ? 'articles.html' : `articles.html?page=${n}`;
+
+    items.push(page > 1
+      ? `<a href="${qs(page-1)}" aria-label="السابق">السابق</a>`
+      : `<span class="is-disabled">السابق</span>`);
+
+    for (let i = 1; i <= pages; i++) {
+      if (i === 1 || i === pages || Math.abs(i - page) <= 1) {
+        items.push(i === page
+          ? `<span class="is-current">${i}</span>`
+          : `<a href="${qs(i)}">${i}</a>`);
+      } else if (items[items.length - 1] !== '<span class="is-disabled">…</span>') {
+        items.push('<span class="is-disabled">…</span>');
+      }
+    }
+
+    items.push(page < pages
+      ? `<a href="${qs(page+1)}" aria-label="التالي">التالي</a>`
+      : `<span class="is-disabled">التالي</span>`);
+
+    el.innerHTML = items.join('');
+  }
+
+  /* SEO */
+  const db = AAB.DB.get();
+  AAB.setSEO({
+    title: `جميع المقالات (${total}) — ${db.settings.siteName}`,
+    description: 'استعرض كل مقالات مدونة Abdallah Abas في تطوير الويب، تحسين محركات البحث، تصميم الواجهات، وريادة الأعمال.',
+    canonical: AAB.SITE + '/articles.html' + (page > 1 ? '?page=' + page : ''),
+    type: 'website',
+    schema: {
+      "@context":"https://schema.org",
+      "@type":"CollectionPage",
+      "name":"جميع المقالات",
+      "url": AAB.SITE + '/articles.html',
+      "inLanguage":"ar",
+      "isPartOf": { "@type":"Blog", "name": db.settings.siteName, "url": AAB.SITE + '/' }
+    }
+  });
+});
+</script>
+</body>
+</html>
