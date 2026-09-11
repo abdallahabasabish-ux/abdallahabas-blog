@@ -1,0 +1,26 @@
+---
+type Heading = { depth: number; slug: string; text: string };
+type Props = { headings: Heading[] };
+const { headings } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+{items.length > 2 && (
+  <nav
+    aria-label="محتويات المقال"
+    class="rounded-2xl border border-ink-100 bg-ink-50/50 p-5"
+  >
+    <h2 class="mb-3 text-sm font-bold text-ink-900">محتويات المقال</h2>
+    <ol class="space-y-1.5 text-sm">
+      {items.map((h) => (
+        <li class={h.depth === 3 ? "ps-4" : ""}>
+          <a
+            href={`#${h.slug}`}
+            class="block rounded-md px-2 py-1 text-ink-500 transition-colors hover:bg-white hover:text-brand-600"
+          >
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
