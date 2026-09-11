@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>البحث — مدونة Abdallah Abas</title>
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://blog.abdallahabas.com/search.html">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="search">
+
+<div id="app-header"></div>
+
+<main id="main">
+  <section class="search-hero">
+    <div class="container">
+      <h1>البحث في المدونة</h1>
+      <p>ابحث في عناوين المقالات، المحتوى، التصنيفات، والوسوم.</p>
+      <form class="search-bar" id="searchForm" action="search.html" method="get" role="search">
+        <input type="search" name="q" placeholder="اكتب كلمة البحث…" aria-label="كلمة البحث" autocomplete="off" id="qInput">
+        <button type="submit">ابحث</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div id="searchSummary" class="search-summary" hidden>
+        <div>نتائج البحث عن: <strong id="termLabel"></strong></div>
+        <div class="result-count"><span id="countLabel">0</span> نتيجة</div>
+      </div>
+      <div id="results"></div>
+    </div>
+  </section>
+</main>
+
+<div id="app-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const q = (new URLSearchParams(location.search).get('q') || '').trim();
+  document.getElementById('qInput').value = q;
+
+  const db = AAB.DB.get();
+  const results = document.getElementById('results');
+  const summary = document.getElementById('searchSummary');
+
+  if (!q) {
+    summary.hidden = true;
+    results.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">${AAB.icon.search}</div>
+        <h2>ابدأ بالبحث</h2>
+        <p>اكتب كلمة في الأعلى لتصفية المقالات حسب العنوان أو المحتوى.</p>
+      </div>`;
+    AAB.setSEO({ title: 'البحث — ' + db.settings.siteName, description: 'ابحث في مقالات مدونة Abdallah Abas.' });
+    return;
+  }
+
+  const needle = q.toLowerCase();
+  const strip = (html) => String(html || '').replace(/<[^>]+>/g, ' ').toLowerCase();
+  const matches = AAB.published().filter(p => {
+    const cat = AAB.getCategory(p.categoryId);
+    const tags = (p.tagIds || []).map(id => (AAB.getTag(id) || {}).name || '').join(' ');
+    return (
+      (p.title || '').toLowerCase().includes(needle) ||
+      (p.excerpt || '').toLowerCase().includes(needle) ||
+      strip(p.content).includes(needle) ||
+      (cat && cat.name.toLowerCase().includes(needle)) ||
+      tags.toLowerCase().includes(needle)
+    );
+  });
+
+  summary.hidden = false;
+  document.getElementById('termLabel').textContent = q;
+  document.getElementById('countLabel').textContent = matches.length;
+
+  if (!matches.length) {
+    results.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">${AAB.icon.search}</div>
+        <h2>لا توجد نتائج مطابقة</h2>
+        <p>جرّب كلمة أخرى، أو تصفّح <a href="articles.html" style="color:var(--brand);font-weight:600">جميع المقالات</a>.</p>
+      </div>`;
+  } else {
+    results.innerHTML = `<div class="grid grid-2" style="gap:28px">
+      ${matches.map(p => AAB.postCard(p)).join('')}
+    </div>`;
+  }
+
+  AAB.setSEO({
+    title: `بحث: ${q} — ${db.settings.siteName}`,
+    description: `نتائج البحث عن "${q}" في مدونة Abdallah Abas.`,
+    canonical: AAB.SITE + '/search.html?q=' + encodeURIComponent(q)
+  });
+});
+</script>
+</body>
+</html>
