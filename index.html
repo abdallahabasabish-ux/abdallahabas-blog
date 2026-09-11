@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مدونة Abdallah Abas — المعرفة التي تبني حضورك الرقمي</title>
+<meta name="description" content="مقالات عملية في تطوير الويب، تحسين محركات البحث، تصميم الواجهات، وبناء المشاريع الرقمية.">
+<link rel="canonical" href="https://blog.abdallahabas.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="مدونة Abdallah Abas">
+<meta property="og:description" content="مقالات عملية في تطوير الويب وتحسين محركات البحث وبناء الحضور الرقمي.">
+<meta property="og:url" content="https://blog.abdallahabas.com/">
+<meta property="og:locale" content="ar_AR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Blog",
+  "name":"مدونة Abdallah Abas",
+  "url":"https://blog.abdallahabas.com/",
+  "inLanguage":"ar",
+  "publisher":{ "@type":"Organization","name":"Abdallah Abas","url":"https://abdallahabas.com" }
+}
+</script>
+</head>
+<body data-page="home">
+
+<div id="app-header"></div>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+          مدونة Abdallah Abas
+        </span>
+        <h1 class="hero-title">
+          المعرفة التي تساعدك على بناء
+          <span class="hl">حضورك الرقمي</span>
+          وتطوير أعمالك
+        </h1>
+        <p class="hero-sub">
+          مقالات عملية ومختبرة في تطوير الويب، تحسين محركات البحث، تصميم الواجهات،
+          وبناء المشاريع الرقمية — بدون حشو، وبدون نظريات لا تُطبَّق.
+        </p>
+        <div class="hero-actions">
+          <a href="articles.html" class="btn btn-brand btn-lg">
+            استكشف المقالات
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </a>
+          <a href="https://abdallahabas.com" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">استعرض الخدمات</a>
+        </div>
+        <div class="hero-stats" id="heroStats"></div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hv-card hv-card--main">
+          <div class="hv-thumb"></div>
+          <div class="hv-lines"><i style="width:70%"></i><i style="width:45%"></i></div>
+        </div>
+        <div class="hv-card hv-card--float">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+          <div><b>+180%</b><span>زيادة الزيارات</span></div>
+        </div>
+        <div class="hv-blob"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="section" id="featuredSection">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">مقالات مميزة</h2>
+          <p class="section-sub">محتوى مختار بعناية يستحق وقتك</p>
+        </div>
+        <a href="articles.html" class="link-more">كل المقالات
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </a>
+      </div>
+      <div class="grid grid-featured" id="featuredGrid"></div>
+    </div>
+  </section>
+
+  <!-- LATEST + SIDEBAR -->
+  <section class="section section-alt">
+    <div class="container layout-2col">
+      <div>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">أحدث المقالات</h2>
+            <p class="section-sub">جديد المدونة</p>
+          </div>
+        </div>
+        <div class="grid grid-2" id="latestGrid"></div>
+        <div class="center mt-32">
+          <a href="articles.html" class="btn btn-outline">تحميل المزيد من المقالات</a>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="widget">
+          <h3 class="widget-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+            الأكثر قراءة
+          </h3>
+          <ol class="rank-list" id="mostReadList"></ol>
+        </div>
+
+        <div class="widget">
+          <h3 class="widget-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            التصنيفات
+          </h3>
+          <ul class="cat-list" id="sideCatList"></ul>
+        </div>
+
+        <div class="widget widget-cta">
+          <h3>تحتاج مساعدة في مشروعك؟</h3>
+          <p>خدمات تطوير الويب، تحسين محركات البحث، وتصميم الواجهات.</p>
+          <a href="https://abdallahabas.com" target="_blank" rel="noopener" class="btn btn-brand btn-block">استعرض الخدمات</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">تصفّح حسب التصنيف</h2>
+          <p class="section-sub">اختر المجال الذي يهمك</p>
+        </div>
+        <a href="categories.html" class="link-more">كل التصنيفات
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </a>
+      </div>
+      <div class="grid grid-cats" id="catGrid"></div>
+    </div>
+  </section>
+
+  <!-- PICKS -->
+  <section class="section section-alt" id="picksSection">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">مختارات المحرر</h2>
+          <p class="section-sub">مقالات نعود إليها دائمًا</p>
+        </div>
+      </div>
+      <div class="grid grid-3" id="picksGrid"></div>
+    </div>
+  </section>
+
+  <!-- AUTHOR -->
+  <section class="section">
+    <div class="container">
+      <div class="author-box">
+        <div class="author-box-media">
+          <div class="author-avatar" id="homeAuthorAvatar"></div>
+        </div>
+        <div class="author-box-body">
+          <span class="eyebrow">عن الكاتب</span>
+          <h2 id="homeAuthorName">Abdallah Abas</h2>
+          <p id="homeAuthorBio"></p>
+          <ul class="chip-row" id="homeAuthorSkills"></ul>
+          <div class="hero-actions">
+            <a href="about.html" class="btn btn-brand">تعرّف عليّ أكثر</a>
+            <a href="contact.html" class="btn btn-ghost">تواصل معي</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-band">
+        <div class="cta-band-body">
+          <h2>تحتاج إلى تحسين موقعك أو تطوير مشروعك؟</h2>
+          <p>تعرّف على خدمات Abdallah Abas في التطوير، الأداء، وتحسين محركات البحث.</p>
+        </div>
+        <a href="https://abdallahabas.com" target="_blank" rel="noopener" class="btn btn-dark btn-lg">
+          استعرض الخدمات
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="section" id="newsletterSection" hidden>
+    <div class="container">
+      <div class="newsletter">
+        <h2>اشترك في النشرة البريدية</h2>
+        <p>مقالات مختارة وأدوات عملية، مرة كل أسبوعين. بدون إزعاج.</p>
+        <form class="newsletter-form" id="newsletterForm" novalidate>
+          <input type="email" name="email" placeholder="بريدك الإلكتروني" required aria-label="بريدك الإلكتروني">
+          <button type="submit" class="btn btn-brand">اشترك</button>
+        </form>
+        <p class="form-note" id="newsletterNote" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="app-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const db = AAB.DB.get();
+  const pub = AAB.published();
+
+  /* Hero stats */
+  const totalViews = pub.reduce((s, p) => s + (p.views || 0), 0);
+  document.getElementById('heroStats').innerHTML = `
+    <div class="stat"><b>${pub.length}</b><span>مقال منشور</span></div>
+    <div class="stat"><b>${db.categories.length}</b><span>تصنيف</span></div>
+    <div class="stat"><b>${AAB.compactNum(totalViews)}</b><span>قراءة</span></div>
+  `;
+
+  /* Featured */
+  const featured = pub.filter(p => p.featured).slice(0, 3);
+  const featEl = document.getElementById('featuredGrid');
+  if (featured.length) {
+    featEl.innerHTML = featured.map((p, i) => AAB.postCard(p, i === 0 ? 'wide' : '')).join('');
+  } else {
+    document.getElementById('featuredSection').hidden = true;
+  }
+
+  /* Latest */
+  document.getElementById('latestGrid').innerHTML =
+    pub.slice(0, 6).map(p => AAB.postCard(p)).join('') ||
+    '<p class="empty-inline">لا توجد مقالات بعد.</p>';
+
+  /* Most read */
+  const mostRead = pub.slice().sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+  document.getElementById('mostReadList').innerHTML =
+    mostRead.map((p, i) => `
+      <li>
+        <span class="rank">${i + 1}</span>
+        <a href="article.html?slug=${encodeURIComponent(p.slug)}">${AAB.esc(p.title)}</a>
+      </li>`).join('') || '<li class="empty-inline">لا يوجد محتوى.</li>';
+
+  /* Sidebar categories */
+  document.getElementById('sideCatList').innerHTML =
+    db.categories.slice().sort((a, b) => a.order - b.order).map(c => {
+      const n = pub.filter(p => p.categoryId === c.id).length;
+      return `<li><a href="category.html?slug=${encodeURIComponent(c.slug)}">
+        <span>${AAB.esc(c.name)}</span><em>${n}</em></a></li>`;
+    }).join('');
+
+  /* Category grid */
+  document.getElementById('catGrid').innerHTML =
+    db.categories.slice().sort((a, b) => a.order - b.order).map(c => {
+      const n = pub.filter(p => p.categoryId === c.id).length;
+      return `<a class="cat-card" href="category.html?slug=${encodeURIComponent(c.slug)}">
+        <span class="cat-icon" style="--c:${c.color || 'var(--brand)'}">${AAB.catIcon(c.icon)}</span>
+        <h3>${AAB.esc(c.name)}</h3>
+        <p>${AAB.esc(c.description || '')}</p>
+        <span class="cat-count">${n} مقال</span>
+      </a>`;
+    }).join('');
+
+  /* Editor picks */
+  const picks = pub.slice().sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+  document.getElementById('picksGrid').innerHTML = picks.map(p => AAB.postCard(p)).join('');
+  if (!picks.length) document.getElementById('picksSection').hidden = true;
+
+  /* Author */
+  const a = db.author;
+  document.getElementById('homeAuthorName').textContent = a.name;
+  document.getElementById('homeAuthorBio').textContent = a.bio;
+  const av = document.getElementById('homeAuthorAvatar');
+  av.innerHTML = `<img src="${AAB.esc(a.avatar)}" alt="${AAB.esc(a.name)}" width="180" height="180" loading="lazy"
+    onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(a.name)}','180'))">`;
+  document.getElementById('homeAuthorSkills').innerHTML =
+    (a.skills || []).map(s => `<li class="chip">${AAB.esc(s)}</li>`).join('');
+
+  /* Newsletter */
+  if (db.settings.newsletterEnabled) {
+    document.getElementById('newsletterSection').hidden = false;
+    document.getElementById('newsletterForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = this.email.value.trim();
+      const note = document.getElementById('newsletterNote');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        note.textContent = 'يرجى إدخال بريد إلكتروني صحيح.';
+        note.className = 'form-note is-error';
+        return;
+      }
+      AAB.DB.addSubscriber(email);
+      note.textContent = 'تم تسجيل بريدك بنجاح. شكرًا لاشتراكك!';
+      note.className = 'form-note is-ok';
+      this.reset();
+    });
+  }
+
+  /* SEO */
+  const s = db.settings;
+  AAB.setSEO({
+    title: s.siteName + ' — ' + s.tagline,
+    description: s.description,
+    canonical: AAB.SITE + '/',
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": s.siteName,
+      "description":
