@@ -1,0 +1,4 @@
+# Redirects — Netlify / Cloudflare Pages
+/blog/*          /articles.html              301
+/post/:slug      /article.html?slug=:slug    301
+/admin           /admin/index.html           200
