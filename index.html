@@ -17,24 +17,28 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
-<script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"Blog",
-  "name":"مدونة Abdallah Abas",
-  "url":"https://blog.abdallahabas.com/",
-  "inLanguage":"ar",
-  "publisher":{ "@type":"Organization","name":"Abdallah Abas","url":"https://abdallahabas.com" }
-}
-</script>
+<style>
+  /* مؤشر التحميل */
+  .skel{position:relative;overflow:hidden;background:var(--bg-3);border-radius:12px}
+  .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:skel 1.3s infinite}
+  @keyframes skel{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .skel-card{height:340px}
+  #pageLoader{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+  #pageLoader.is-hidden{opacity:0;pointer-events:none}
+  .loader-ring{width:44px;height:44px;border:3px solid var(--brand-50);border-top-color:var(--brand);border-radius:50%;animation:ring .8s linear infinite}
+  @keyframes ring{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body data-page="home">
+
+<!-- شاشة التحميل الأولية -->
+<div id="pageLoader"><div class="loader-ring" role="status" aria-label="جارٍ التحميل"></div></div>
 
 <div id="app-header"></div>
 
 <main id="main">
 
-  <!-- HERO -->
+  <!-- ============ HERO ============ -->
   <section class="hero">
     <div class="container hero-inner">
       <div class="hero-copy">
@@ -58,7 +62,9 @@
           </a>
           <a href="https://abdallahabas.com" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">استعرض الخدمات</a>
         </div>
-        <div class="hero-stats" id="heroStats"></div>
+        <div class="hero-stats" id="heroStats">
+          <div class="stat"><b>—</b><span>جارٍ التحميل…</span></div>
+        </div>
       </div>
 
       <div class="hero-visual" aria-hidden="true">
@@ -75,7 +81,7 @@
     </div>
   </section>
 
-  <!-- FEATURED -->
+  <!-- ============ FEATURED ============ -->
   <section class="section" id="featuredSection">
     <div class="container">
       <div class="section-head">
@@ -87,11 +93,13 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </a>
       </div>
-      <div class="grid grid-featured" id="featuredGrid"></div>
+      <div class="grid grid-featured" id="featuredGrid">
+        <div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div>
+      </div>
     </div>
   </section>
 
-  <!-- LATEST + SIDEBAR -->
+  <!-- ============ LATEST + SIDEBAR ============ -->
   <section class="section section-alt">
     <div class="container layout-2col">
       <div>
@@ -101,7 +109,10 @@
             <p class="section-sub">جديد المدونة</p>
           </div>
         </div>
-        <div class="grid grid-2" id="latestGrid"></div>
+        <div class="grid grid-2" id="latestGrid">
+          <div class="skel skel-card"></div><div class="skel skel-card"></div>
+          <div class="skel skel-card"></div><div class="skel skel-card"></div>
+        </div>
         <div class="center mt-32">
           <a href="articles.html" class="btn btn-outline">تحميل المزيد من المقالات</a>
         </div>
@@ -113,7 +124,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
             الأكثر قراءة
           </h3>
-          <ol class="rank-list" id="mostReadList"></ol>
+          <ol class="rank-list" id="mostReadList"><li class="empty-inline">جارٍ التحميل…</li></ol>
         </div>
 
         <div class="widget">
@@ -121,7 +132,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
             التصنيفات
           </h3>
-          <ul class="cat-list" id="sideCatList"></ul>
+          <ul class="cat-list" id="sideCatList"><li class="empty-inline">جارٍ التحميل…</li></ul>
         </div>
 
         <div class="widget widget-cta">
@@ -133,7 +144,7 @@
     </div>
   </section>
 
-  <!-- CATEGORIES -->
+  <!-- ============ CATEGORIES ============ -->
   <section class="section">
     <div class="container">
       <div class="section-head">
@@ -145,11 +156,16 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </a>
       </div>
-      <div class="grid grid-cats" id="catGrid"></div>
+      <div class="grid grid-cats" id="catGrid">
+        <div class="skel" style="height:180px"></div>
+        <div class="skel" style="height:180px"></div>
+        <div class="skel" style="height:180px"></div>
+        <div class="skel" style="height:180px"></div>
+      </div>
     </div>
   </section>
 
-  <!-- PICKS -->
+  <!-- ============ PICKS ============ -->
   <section class="section section-alt" id="picksSection">
     <div class="container">
       <div class="section-head">
@@ -158,11 +174,13 @@
           <p class="section-sub">مقالات نعود إليها دائمًا</p>
         </div>
       </div>
-      <div class="grid grid-3" id="picksGrid"></div>
+      <div class="grid grid-3" id="picksGrid">
+        <div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div>
+      </div>
     </div>
   </section>
 
-  <!-- AUTHOR -->
+  <!-- ============ AUTHOR ============ -->
   <section class="section">
     <div class="container">
       <div class="author-box">
@@ -171,7 +189,7 @@
         </div>
         <div class="author-box-body">
           <span class="eyebrow">عن الكاتب</span>
-          <h2 id="homeAuthorName">Abdallah Abas</h2>
+          <h2 id="homeAuthorName">—</h2>
           <p id="homeAuthorBio"></p>
           <ul class="chip-row" id="homeAuthorSkills"></ul>
           <div class="hero-actions">
@@ -183,7 +201,7 @@
     </div>
   </section>
 
-  <!-- CTA -->
+  <!-- ============ CTA ============ -->
   <section class="section">
     <div class="container">
       <div class="cta-band">
@@ -199,7 +217,7 @@
     </div>
   </section>
 
-  <!-- NEWSLETTER -->
+  <!-- ============ NEWSLETTER ============ -->
   <section class="section" id="newsletterSection" hidden>
     <div class="container">
       <div class="newsletter">
@@ -218,14 +236,34 @@
 
 <div id="app-footer"></div>
 
+<!-- ============ Scripts ============ -->
 <script src="assets/js/data.js"></script>
 <script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+<script type="module">
+import "./assets/js/firebase-data.js";
+
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await AAB.firebaseReady();
+  } catch (e) {
+    console.warn('[index] Firebase unavailable, using cache.', e);
+  }
+
+  /* إعادة رسم الهيدر/الفوتر بعد وصول البيانات */
+  AAB.renderHeader();
+  AAB.renderFooter();
+
+  renderHomePage();
+
+  /* إخفاء شاشة التحميل */
+  document.getElementById('pageLoader')?.classList.add('is-hidden');
+});
+
+function renderHomePage() {
   const db = AAB.DB.get();
   const pub = AAB.published();
 
-  /* Hero stats */
+  /* --- Hero stats --- */
   const totalViews = pub.reduce((s, p) => s + (p.views || 0), 0);
   document.getElementById('heroStats').innerHTML = `
     <div class="stat"><b>${pub.length}</b><span>مقال منشور</span></div>
@@ -233,68 +271,80 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="stat"><b>${AAB.compactNum(totalViews)}</b><span>قراءة</span></div>
   `;
 
-  /* Featured */
+  /* --- Featured --- */
   const featured = pub.filter(p => p.featured).slice(0, 3);
   const featEl = document.getElementById('featuredGrid');
+  const featSection = document.getElementById('featuredSection');
   if (featured.length) {
     featEl.innerHTML = featured.map((p, i) => AAB.postCard(p, i === 0 ? 'wide' : '')).join('');
   } else {
-    document.getElementById('featuredSection').hidden = true;
+    featSection.hidden = true;
   }
 
-  /* Latest */
-  document.getElementById('latestGrid').innerHTML =
-    pub.slice(0, 6).map(p => AAB.postCard(p)).join('') ||
-    '<p class="empty-inline">لا توجد مقالات بعد.</p>';
+  /* --- Latest --- */
+  const latestGrid = document.getElementById('latestGrid');
+  const latest = pub.slice(0, 6);
+  latestGrid.innerHTML = latest.length
+    ? latest.map(p => AAB.postCard(p)).join('')
+    : '<p class="empty-inline">لا توجد مقالات بعد.</p>';
 
-  /* Most read */
+  /* --- Most read --- */
   const mostRead = pub.slice().sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
-  document.getElementById('mostReadList').innerHTML =
-    mostRead.map((p, i) => `
-      <li>
-        <span class="rank">${i + 1}</span>
-        <a href="article.html?slug=${encodeURIComponent(p.slug)}">${AAB.esc(p.title)}</a>
-      </li>`).join('') || '<li class="empty-inline">لا يوجد محتوى.</li>';
+  document.getElementById('mostReadList').innerHTML = mostRead.length
+    ? mostRead.map((p, i) => `
+        <li>
+          <span class="rank">${i + 1}</span>
+          <a href="article.html?slug=${encodeURIComponent(p.slug)}">${AAB.esc(p.title)}</a>
+        </li>`).join('')
+    : '<li class="empty-inline">لا يوجد محتوى.</li>';
 
-  /* Sidebar categories */
-  document.getElementById('sideCatList').innerHTML =
-    db.categories.slice().sort((a, b) => a.order - b.order).map(c => {
-      const n = pub.filter(p => p.categoryId === c.id).length;
-      return `<li><a href="category.html?slug=${encodeURIComponent(c.slug)}">
-        <span>${AAB.esc(c.name)}</span><em>${n}</em></a></li>`;
-    }).join('');
+  /* --- Sidebar categories --- */
+  const cats = db.categories.slice().sort((a, b) => (a.order || 0) - (b.order || 0));
+  document.getElementById('sideCatList').innerHTML = cats.length
+    ? cats.map(c => {
+        const n = pub.filter(p => p.categoryId === c.id).length;
+        return `<li><a href="category.html?slug=${encodeURIComponent(c.slug)}">
+          <span>${AAB.esc(c.name)}</span><em>${n}</em></a></li>`;
+      }).join('')
+    : '<li class="empty-inline">لا توجد تصنيفات.</li>';
 
-  /* Category grid */
-  document.getElementById('catGrid').innerHTML =
-    db.categories.slice().sort((a, b) => a.order - b.order).map(c => {
-      const n = pub.filter(p => p.categoryId === c.id).length;
-      return `<a class="cat-card" href="category.html?slug=${encodeURIComponent(c.slug)}">
-        <span class="cat-icon" style="--c:${c.color || 'var(--brand)'}">${AAB.catIcon(c.icon)}</span>
-        <h3>${AAB.esc(c.name)}</h3>
-        <p>${AAB.esc(c.description || '')}</p>
-        <span class="cat-count">${n} مقال</span>
-      </a>`;
-    }).join('');
+  /* --- Category grid --- */
+  document.getElementById('catGrid').innerHTML = cats.length
+    ? cats.map(c => {
+        const n = pub.filter(p => p.categoryId === c.id).length;
+        return `<a class="cat-card" href="category.html?slug=${encodeURIComponent(c.slug)}">
+          <span class="cat-icon" style="--c:${c.color || 'var(--brand)'}">${AAB.catIcon(c.icon)}</span>
+          <h3>${AAB.esc(c.name)}</h3>
+          <p>${AAB.esc(c.description || '')}</p>
+          <span class="cat-count">${n} مقال</span>
+        </a>`;
+      }).join('')
+    : '<p class="empty-inline">لا توجد تصنيفات بعد.</p>';
 
-  /* Editor picks */
+  /* --- Editor picks --- */
   const picks = pub.slice().sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
-  document.getElementById('picksGrid').innerHTML = picks.map(p => AAB.postCard(p)).join('');
-  if (!picks.length) document.getElementById('picksSection').hidden = true;
+  const picksGrid = document.getElementById('picksGrid');
+  if (picks.length) {
+    picksGrid.innerHTML = picks.map(p => AAB.postCard(p)).join('');
+  } else {
+    document.getElementById('picksSection').hidden = true;
+  }
 
-  /* Author */
+  /* --- Author --- */
   const a = db.author;
   document.getElementById('homeAuthorName').textContent = a.name;
   document.getElementById('homeAuthorBio').textContent = a.bio;
-  const av = document.getElementById('homeAuthorAvatar');
-  av.innerHTML = `<img src="${AAB.esc(a.avatar)}" alt="${AAB.esc(a.name)}" width="180" height="180" loading="lazy"
-    onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(a.name)}','180'))">`;
+  document.getElementById('homeAuthorAvatar').innerHTML =
+    `<img src="${AAB.esc(a.avatar)}" alt="${AAB.esc(a.name)}" width="180" height="180" loading="lazy"
+          onerror="this.replaceWith(AAB.avatarFallback('${AAB.esc(a.name)}','180'))">`;
   document.getElementById('homeAuthorSkills').innerHTML =
     (a.skills || []).map(s => `<li class="chip">${AAB.esc(s)}</li>`).join('');
 
-  /* Newsletter */
+  /* --- Newsletter --- */
   if (db.settings.newsletterEnabled) {
     document.getElementById('newsletterSection').hidden = false;
-    document.getElementById('newsletterForm').addEventListener('submit', function (e) {
+    const nlForm = document.getElementById('newsletterForm');
+    nlForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       const email = this.email.value.trim();
       const note = document.getElementById('newsletterNote');
@@ -303,14 +353,20 @@ document.addEventListener('DOMContentLoaded', function () {
         note.className = 'form-note is-error';
         return;
       }
-      AAB.DB.addSubscriber(email);
-      note.textContent = 'تم تسجيل بريدك بنجاح. شكرًا لاشتراكك!';
-      note.className = 'form-note is-ok';
-      this.reset();
+      try {
+        await AAB.DB.addSubscriber(email);
+        note.textContent = 'تم تسجيل بريدك بنجاح. شكرًا لاشتراكك!';
+        note.className = 'form-note is-ok';
+        this.reset();
+      } catch (err) {
+        console.error(err);
+        note.textContent = 'حدث خطأ. حاول لاحقًا.';
+        note.className = 'form-note is-error';
+      }
     });
   }
 
-  /* SEO */
+  /* --- SEO --- */
   const s = db.settings;
   AAB.setSEO({
     title: s.siteName + ' — ' + s.tagline,
@@ -326,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function () {
       "author": { "@type": "Person", "name": db.author.name, "url": AAB.STORE }
     }
   });
-});
+}
 </script>
 </body>
 </html>
